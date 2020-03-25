@@ -18,7 +18,7 @@ connection.once("open", () => {
 const usersRouter = require("./routes/users.js");
 const lifegoalsRouter = require("./routes/lifegoals.js");
 
-app.use("/", usersRouter);
+app.use("/users", usersRouter);
 app.use("/lifegoals", lifegoalsRouter);
 
 app.listen(port, () => {

@@ -32,7 +32,7 @@ const userSchema = new Schema(
 );
 
 userSchema.statics.authenticate = (username, password, callback) => {
-  User.fineOne({ username: username }).exec((error, user) => {
+  User.findOne({ username: username }).exec((error, user) => {
     if (error) {
       return callback(error);
     } else if (!user) {
@@ -44,7 +44,7 @@ userSchema.statics.authenticate = (username, password, callback) => {
       if (result === true) {
         return callback(null, user);
       } else {
-        return callback();
+        return callback(error);
       }
     });
   });

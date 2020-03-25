@@ -18,7 +18,7 @@ router.route("/signup").post((req, res) => {
   console.log(req.body);
   bcrypt.hash(password, 10, function(err, hash) {
     newUser.password = hash;
-    if ()
+    // if ()
     newUser
       .save()
       .then(() => res.json(`${username} signed up successfully!`))

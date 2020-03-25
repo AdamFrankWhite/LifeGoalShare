@@ -22,6 +22,10 @@ const lifeGoalSchema = new Schema(
       required: true,
       trim: true,
       minLength: 6
+    },
+    followers: {
+      type: Array,
+      required: true
     }
   },
   {
