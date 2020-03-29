@@ -20,18 +20,7 @@ const usersRouter = require("./routes/users.js");
 const lifegoalsRouter = require("./routes/lifegoals.js");
 
 app.use("/users", usersRouter);
-app.use("/lifegoals", verifyToken, lifegoalsRouter, (req, res) => {
-  jwt.verify(req.token, "secret_key", (err, authData) => {
-    if (err) {
-      res.sendStatus(403);
-    } else {
-      res.json({
-        message: "you have done something lifegoal",
-        authData
-      });
-    }
-  });
-});
+app.use("/lifegoals", verifyToken, lifegoalsRouter);
 
 app.listen(port, () => {
   console.log(`Server is up and running on port ${port}`);
