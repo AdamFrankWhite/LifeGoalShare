@@ -20,7 +20,7 @@ const usersRouter = require("./routes/users.js");
 const lifegoalsRouter = require("./routes/lifegoals.js");
 
 app.use("/users", usersRouter);
-app.use("/lifegoals", verifyToken, lifegoalsRouter, () => {
+app.use("/lifegoals", verifyToken, lifegoalsRouter, (req, res) => {
   jwt.verify(req.token, "secret_key", (err, authData) => {
     if (err) {
       res.sendStatus(403);
