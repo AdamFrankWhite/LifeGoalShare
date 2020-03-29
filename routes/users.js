@@ -16,7 +16,6 @@ router.route("/signup").post((req, res) => {
     password,
     email
   });
-  console.log(req.body);
   bcrypt.hash(password, 10, function(err, hash) {
     newUser.password = hash;
     // if ()
@@ -44,7 +43,10 @@ router.route("/login").post((req, res) => {
       // If authorised, create token
       jwt.sign({ user }, "secret_key", (err, token) => {
         if (token) {
-          res.json("Success: ");
+          // add res.header = token   ??
+          console.log(token);
+          res.json({ token });
+          //TODO: put token in local storage
         } else {
           res.json("Error: " + err);
         }

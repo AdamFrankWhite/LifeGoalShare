@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 function verifyToken(req, res, next) {
   // Get auth header value
   const bearerHeader = req.headers["authorization"];
-  console.log(bearerHeader);
   //FORMAT OF TOKEN:
   // Authorization: Bearer <access_token>
 
