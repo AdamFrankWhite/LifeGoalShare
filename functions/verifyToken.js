@@ -13,7 +13,7 @@ function verifyToken(req, res, next) {
       if (err) {
         res.sendStatus(403);
       } else {
-        console.log({ message: "you have done something lifegoal", authData });
+        // console.log({ message: "you have done something lifegoal", authData });
         next();
       }
     });

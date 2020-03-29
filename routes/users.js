@@ -41,10 +41,9 @@ router.route("/login").post((req, res) => {
     } else {
       console.log("Logged In");
       // If authorised, create token
-      jwt.sign({ user }, "secret_key", (err, token) => {
+      jwt.sign({ user }, "secret_key", { expiresIn: "180m" }, (err, token) => {
         if (token) {
           // add res.header = token   ??
-          console.log(token);
           res.json({ token });
           //TODO: put token in local storage
         } else {
