@@ -1,6 +1,7 @@
 const router = require("express").Router();
 let User = require("../models/user.model");
 let bcrypt = require("bcrypt");
+let jwt = require("jsonwebtoken");
 
 router.route("/").get((req, res) => {
   User.find()
@@ -31,7 +32,7 @@ router.route("/login").post((req, res) => {
     username: req.body.username,
     password: req.body.password
   };
-
+  //Authentication
   User.authenticate(user.username, user.password, (error, user) => {
     if (error || !user) {
       let err = new Error();
@@ -40,7 +41,14 @@ router.route("/login").post((req, res) => {
       return res.json(err);
     } else {
       console.log("Logged In");
-      return res.json("success");
+      // If authorised, create token
+      jwt.sign({ user }, "secret_key", (err, token) => {
+        if (token) {
+          res.json("Success: ");
+        } else {
+          res.json("Error: " + err);
+        }
+      });
     }
   });
 });

@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const verifyToken = require("./functions/verifyToken");
 
 require("dotenv").config();
 const app = express();
@@ -19,7 +20,18 @@ const usersRouter = require("./routes/users.js");
 const lifegoalsRouter = require("./routes/lifegoals.js");
 
 app.use("/users", usersRouter);
-app.use("/lifegoals", lifegoalsRouter);
+app.use("/lifegoals", verifyToken, lifegoalsRouter, () => {
+  jwt.verify(req.token, "secret_key", (err, authData) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      res.json({
+        message: "you have done something lifegoal",
+        authData
+      });
+    }
+  });
+});
 
 app.listen(port, () => {
   console.log(`Server is up and running on port ${port}`);
