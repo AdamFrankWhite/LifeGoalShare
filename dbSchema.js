@@ -2,6 +2,7 @@ let db = {
   lifegoals: [
     {
       followers: ["Carrot9"],
+      comments: [],
       _id: "5e7b85ebb347ab3f48375668",
       lifeGoalName: "want to have no debt",
       lifeGoalDescription: "I want to be have no money",
@@ -20,7 +21,10 @@ let db = {
       email: "barry123@gmail.com",
       createdAt: "2020-03-25T11:47:47.999Z",
       updatedAt: "2020-03-25T11:47:47.999Z",
-      __v: 0
+      __v: 0,
+      imageUrl: "http://somepic.com/somepic.jpg",
+      profile: "About me",
+      location: "London"
     }
   ]
 };

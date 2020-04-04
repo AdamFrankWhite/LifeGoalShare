@@ -2,11 +2,15 @@ const router = require("express").Router();
 const LifeGoal = require("../models/lifegoal.model");
 const jwt = require("jsonwebtoken");
 
+// Get all LifeGoals
+
 router.route("/").get((req, res) => {
   LifeGoal.find()
     .then(data => res.json(data))
     .catch(error => res.status(400).json("Error: " + error));
 });
+
+// Add a LifeGoal
 
 router.route("/add").post((req, res) => {
   const { lifeGoalName, lifeGoalDescription, createdBy, followers } = req.body;
@@ -23,7 +27,9 @@ router.route("/add").post((req, res) => {
 });
 
 router.route("/delete/:id").delete((req, res) => {
+  // Grab username from JWT
   let loggedInUser = "";
+  // Grab lifegoal createdBy value
   let lifeGoalCreator = "";
   jwt.verify(req.headers.authorization, "secret_key", (err, authData) => {
     if (err) {
@@ -34,13 +40,14 @@ router.route("/delete/:id").delete((req, res) => {
       console.log(loggedInUser);
     }
   });
-  // console.log(LifeGoal.findById(req.params.id));
+  // Find lifegoal
   LifeGoal.findById(req.params.id)
     .then(lifegoal => {
       console.log(lifegoal.createdBy, loggedInUser);
       lifeGoalCreator = lifegoal.createdBy;
     })
     .then(data => {
+      //Check if lifegoal was created by user. If so, delete
       if (loggedInUser == lifeGoalCreator) {
         console.log("hello");
         LifeGoal.findByIdAndDelete(req.params.id)

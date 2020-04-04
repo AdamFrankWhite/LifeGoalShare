@@ -18,17 +18,40 @@ const userSchema = new Schema(
       trim: true,
       minLength: 6
     },
+    confirmPassword: {
+      type: String,
+      required: true,
+      trim: true,
+      minLength: 6
+    },
     email: {
       type: String,
       required: true,
       unique: true,
       trim: true,
       minLength: 6
+    },
+    imgUrl: {
+      type: String,
+      trim: true,
+      minLength: 6
+    },
+    profile: {
+      type: String,
+      unique: true,
+      trim: true,
+      minLength: 6
+    },
+    location: {
+      type: String,
+      trim: true,
+      minLength: 6
     }
   },
   {
     timestamps: true
-  }
+  },
+  { runValidators: true }
 );
 
 userSchema.statics.authenticate = (username, password, callback) => {

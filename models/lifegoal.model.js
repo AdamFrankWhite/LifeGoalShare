@@ -26,6 +26,9 @@ const lifeGoalSchema = new Schema(
     followers: {
       type: Array,
       required: true
+    },
+    comments: {
+      type: Array
     }
   },
   {
