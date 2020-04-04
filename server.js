@@ -1,25 +1,35 @@
+// Imports
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyparser = require("body-parser");
 const verifyToken = require("./functions/verifyToken");
 
-require("dotenv").config();
-const app = express();
-const port = process.env.PORT || 5000;
-app.use(express.json());
-const dbURI = process.env.ATLAS_URI;
+// Config
 
+const port = process.env.PORT || 5000;
+require("dotenv").config();
+
+// DB Config
+const dbURI = process.env.ATLAS_URI;
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.set("useCreateIndex", true);
 
 const connection = mongoose.connection;
 connection.once("open", () => {
-  console.log("Connect to Mongo");
+  console.log("Connected to Mongo");
 });
+
+// Initialise App
+const app = express();
+app.use(express.json());
+
+// Routers
 const usersRouter = require("./routes/users.js");
 const lifegoalsRouter = require("./routes/lifegoals.js");
 
+// Routes
 app.use("/users", usersRouter);
 app.use("/lifegoals", verifyToken, lifegoalsRouter);
 
