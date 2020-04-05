@@ -48,20 +48,20 @@ exports.signup = (req, res) => {
       password === confirmPassword
     ) {
       createNewUser();
-    }
-  } else {
-    if (username.length < 6) {
-      errorMessage.usernameError = "Username must be at least 6 characters";
-    }
-    if (!email.includes("@") || email.length < 5) {
-      errorMessage.emailError = "Please enter a valid email address";
-    }
+    } else {
+      if (username.length < 6) {
+        errorMessage.usernameError = "Username must be at least 6 characters";
+      }
+      if (!email.includes("@") || email.length < 5) {
+        errorMessage.emailError = "Please enter a valid email address";
+      }
 
-    if (password !== confirmPassword) {
-      errorMessage.confirmPasswordError = "Passwords must match";
+      if (password !== confirmPassword) {
+        errorMessage.confirmPasswordError = "Passwords must match";
+      }
+      res.status = 401;
+      res.json(errorMessage);
     }
-    res.status = 401;
-    res.json(errorMessage);
   }
 };
 
