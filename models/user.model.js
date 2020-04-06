@@ -50,8 +50,7 @@ const userSchema = new Schema(
   },
   {
     timestamps: true
-  },
-  { runValidators: true }
+  }
 );
 
 userSchema.statics.authenticate = (username, password, callback) => {

@@ -2,6 +2,12 @@ const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+const crypto = require("crypto");
+const multer = require("multer");
+const GridFsStorage = require("multer-gridfs-storage");
+const Grid = require("gridfs-stream");
+const methodOverride = require("method-override");
+
 exports.getAllUsers = (req, res) => {
   User.find()
     .then(users => res.json(users))
@@ -93,4 +99,31 @@ exports.login = (req, res) => {
   });
 };
 
-exports.uploadProfileImage = (req, res) => {};
+exports.uploadProfileImage = (req, res) => {
+  // Init gfs
+  let gfs = Grid(connection.db, mongoose.mongo);
+  gfs.collection("uploads");
+
+  //Create storage engine
+  const storage = new GridFsStorage({
+    url: process.env.ATLAS_URI,
+    file: (req, file) => {
+      return new Promise((resolve, reject) => {
+        crypto.randomBytes(16, (err, buf) => {
+          if (err) {
+            return reject(err);
+          }
+          const filename =
+            buf.toString("hex") + path.extname(file.originalname);
+          const fileInfo = {
+            filename: filename,
+            bucketName: "uploads"
+          };
+          resolve(fileInfo);
+        });
+      });
+    }
+  });
+  multer({ storage });
+  return res.json({ file: req.file });
+};

@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const upload = require("../functions/userFunctions");
 const {
   getAllUsers,
   signup,
