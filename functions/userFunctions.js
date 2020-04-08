@@ -28,22 +28,36 @@ exports.getAllUsers = (req, res) => {
 
 //POST
 exports.signup = (req, res) => {
-  const { username, password, confirmPassword, email } = req.body;
+  const { username, password, confirmPassword, email, profileImage } = req.body;
+  const imgUrl = profileImage ? profileImage : "PLACEHOLDER_IMAGE_URL";
   const errorMessage = {};
-
   function createNewUser() {
     const newUser = new User({
       username,
       password,
       confirmPassword,
-      email
+      email,
+      profileImage: imgUrl
     });
     bcrypt.hash(password, 10, function(err, hash) {
       newUser.password = hash;
       newUser
         .save()
         .then(() => res.json(`${username} signed up successfully!`))
-        .catch(err => res.status(400).json("Error is... " + err));
+        .catch(err => {
+          console.log(err);
+          let errorMessage;
+          res.status(400);
+          if (err.errmsg.includes("username_1 dup key")) {
+            errorMessage = "Username already taken";
+          }
+          if (err.errmsg.includes("email_1 dup key")) {
+            errorMessage = "Email already in use";
+          }
+          errorMessage
+            ? res.json({ errorMessage })
+            : res.json("Error is... " + err);
+        });
     });
   }
 

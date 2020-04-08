@@ -14,10 +14,11 @@ require("dotenv").config();
 // DB Config
 const dbURI = process.env.ATLAS_URI;
 mongoose.connect(dbURI, {
+  useUnifiedTopology: true,
+  useCreateIndex: true,
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useFindAndModify: false
 });
-mongoose.set("useCreateIndex", true);
 
 const connection = mongoose.connection;
 connection.once("open", () => {
