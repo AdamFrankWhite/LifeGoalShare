@@ -31,13 +31,13 @@ const userSchema = new Schema(
       trim: true,
       minLength: 6
     },
-    profileImage: {
+    profileImageUrl: {
       type: String,
       trim: true,
       minLength: 6
     },
     profile: {
-      type: String,
+      type: Object,
       unique: true,
       trim: true,
       minLength: 6

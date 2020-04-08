@@ -28,8 +28,14 @@ exports.getAllUsers = (req, res) => {
 
 //POST
 exports.signup = (req, res) => {
-  const { username, password, confirmPassword, email, profileImage } = req.body;
-  const imgUrl = profileImage ? profileImage : "PLACEHOLDER_IMAGE_URL";
+  const {
+    username,
+    password,
+    confirmPassword,
+    email,
+    profileImageUrl
+  } = req.body;
+  const imgUrl = profileImageUrl ? profileImageUrl : "PLACEHOLDER_IMAGE_URL";
   const errorMessage = {};
   function createNewUser() {
     const newUser = new User({
@@ -37,7 +43,7 @@ exports.signup = (req, res) => {
       password,
       confirmPassword,
       email,
-      profileImage: imgUrl
+      profileImageUrl: imgUrl
     });
     bcrypt.hash(password, 10, function(err, hash) {
       newUser.password = hash;
@@ -189,4 +195,36 @@ exports.showImageFile = (req, res) => {
       res.status(404).json({ err: "Not an image" });
     }
   });
+};
+
+exports.setProfileImage = (req, res) => {
+  const { userID, profileImageUrl } = req.body;
+
+  User.findOneAndUpdate(
+    { _id: userID },
+    { $set: { profileImageUrl: profileImageUrl } },
+    { new: true },
+    (err, user) => {
+      if (err) {
+        throw err;
+      }
+      res.json(user);
+    }
+  );
+};
+
+exports.updateUserDetails = (req, res) => {
+  const { location, bio, goalCategories, userID } = req.body;
+
+  User.findOneAndUpdate(
+    { _id: userID },
+    { $set: { profile: { location, bio, goalCategories } } },
+    { new: true },
+    (err, user) => {
+      if (err) {
+        throw err;
+      }
+      res.json(user);
+    }
+  );
 };

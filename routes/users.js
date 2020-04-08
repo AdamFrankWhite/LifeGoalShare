@@ -6,24 +6,25 @@ const {
   createProfileImageUpload,
   uploadProfileImage,
   getProfileImageFile,
-  showImageFile
+  showImageFile,
+  updateUserDetails,
+  setProfileImage
 } = require("../functions/userFunctions");
 
 const verifyToken = require("../functions/verifyToken");
 const multer = require("multer");
+const ProfileImageUpload = createProfileImageUpload().single("file");
 
 // Routes
 
 router.route("/").get(verifyToken, getAllUsers);
 router.route("/signup").post(signup);
 router.route("/login").post(login);
+router.route("/profile/update").post(verifyToken, updateUserDetails);
+router.route("/profile/update/img").post(verifyToken, setProfileImage);
 router
   .route("/profile")
-  .post(
-    verifyToken,
-    createProfileImageUpload().single("file"),
-    uploadProfileImage
-  );
+  .post(verifyToken, ProfileImageUpload, uploadProfileImage);
 router.route("/profile/files/:filename").get(verifyToken, getProfileImageFile);
 router.route("/profile/image/:filename").get(verifyToken, showImageFile);
 
