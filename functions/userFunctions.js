@@ -1,12 +1,13 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
+const mongoose = require("mongoose");
 const crypto = require("crypto");
 const multer = require("multer");
 const GridFsStorage = require("multer-gridfs-storage");
 const Grid = require("gridfs-stream");
 const methodOverride = require("method-override");
+const path = require("path");
 
 exports.getAllUsers = (req, res) => {
   User.find()
@@ -99,10 +100,13 @@ exports.login = (req, res) => {
   });
 };
 
-exports.uploadProfileImage = (req, res) => {
+exports.createProfileImage = (req, res) => {
   // Init gfs
-  let gfs = Grid(connection.db, mongoose.mongo);
-  gfs.collection("uploads");
+  const connection = mongoose.connection;
+  connection.once("open", () => {
+    let gfs = Grid(connection.db, mongoose.mongo);
+    gfs.collection("uploads");
+  });
 
   //Create storage engine
   const storage = new GridFsStorage({
@@ -124,6 +128,9 @@ exports.uploadProfileImage = (req, res) => {
       });
     }
   });
-  multer({ storage });
-  return res.json({ file: req.file });
+  return multer({ storage });
+};
+
+exports.uploadProfileImage = (req, res) => {
+  res.json({ file: req.file });
 };

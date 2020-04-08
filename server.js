@@ -68,9 +68,9 @@ const usersRouter = require("./routes/users.js");
 const lifegoalsRouter = require("./routes/lifegoals.js");
 
 // Routes
-app.post("/users/profile", upload.single("file"), (req, res) => {
-  res.json({ file: req.file });
-});
+// app.post("/users/profile", upload.single("file"), (req, res) => {
+//   res.json({ file: req.file });
+// });
 //TODO - move above into userrouter
 app.use("/users", usersRouter);
 app.use("/lifegoals", verifyToken, lifegoalsRouter);
