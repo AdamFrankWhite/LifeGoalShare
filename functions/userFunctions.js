@@ -9,12 +9,24 @@ const Grid = require("gridfs-stream");
 const methodOverride = require("method-override");
 const path = require("path");
 
+// Init gfs
+let gfs;
+const connection = mongoose.connection;
+connection.once("open", () => {
+  gfs = Grid(connection.db, mongoose.mongo);
+  gfs.collection("uploads");
+});
+
+// Export Request Handlers
+
+//GET
 exports.getAllUsers = (req, res) => {
   User.find()
     .then(users => res.json(users))
     .catch(err => res.status(400).json("Error:" + err));
 };
 
+//POST
 exports.signup = (req, res) => {
   const { username, password, confirmPassword, email } = req.body;
   const errorMessage = {};
@@ -72,6 +84,7 @@ exports.signup = (req, res) => {
   }
 };
 
+//POST
 exports.login = (req, res) => {
   const user = {
     username: req.body.username,
@@ -100,18 +113,15 @@ exports.login = (req, res) => {
   });
 };
 
-exports.createProfileImage = (req, res) => {
-  // Init gfs
-  const connection = mongoose.connection;
-  connection.once("open", () => {
-    let gfs = Grid(connection.db, mongoose.mongo);
-    gfs.collection("uploads");
-  });
-
+//POST
+exports.createProfileImageUpload = (req, res) => {
   //Create storage engine
   const storage = new GridFsStorage({
     url: process.env.ATLAS_URI,
     file: (req, file) => {
+      if (file.mimetype !== "image/png" || file.mimetype !== "image/jpeg") {
+        throw "Error: File must be jpg or png";
+      }
       return new Promise((resolve, reject) => {
         crypto.randomBytes(16, (err, buf) => {
           if (err) {
@@ -131,6 +141,37 @@ exports.createProfileImage = (req, res) => {
   return multer({ storage });
 };
 
+//POST
 exports.uploadProfileImage = (req, res) => {
   res.json({ file: req.file });
+};
+
+//GET
+exports.getProfileImageFile = (req, res) => {
+  gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+    //Check if file
+    if (!file || file.length === 0) {
+      return res.status(404).json({ err: "File does not exist" });
+    }
+
+    return res.json(file);
+  });
+};
+
+//GET
+exports.showImageFile = (req, res) => {
+  gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+    //Check if file
+    console.log(file);
+    if (!file || file.length === 0) {
+      return res.status(404).json({ err: "File does not exist" });
+    }
+    if (file.contentType === "image/jpeg" || file.contentType === "image/png") {
+      // Read output to browser
+      const readStream = gfs.createReadStream(file.filename);
+      readStream.pipe(res);
+    } else {
+      res.status(404).json({ err: "Not an image" });
+    }
+  });
 };

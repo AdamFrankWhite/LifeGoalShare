@@ -3,8 +3,10 @@ const {
   getAllUsers,
   signup,
   login,
-  createProfileImage,
-  uploadProfileImage
+  createProfileImageUpload,
+  uploadProfileImage,
+  getProfileImageFile,
+  showImageFile
 } = require("../functions/userFunctions");
 
 const multer = require("multer");
@@ -16,6 +18,8 @@ router.route("/signup").post(signup);
 router.route("/login").post(login);
 router
   .route("/profile")
-  .post(createProfileImage().single("file"), uploadProfileImage);
+  .post(createProfileImageUpload().single("file"), uploadProfileImage);
+router.route("/profile/files/:filename").get(getProfileImageFile);
+router.route("/profile/image/:filename").get(showImageFile);
 
 module.exports = router;
