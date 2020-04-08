@@ -133,7 +133,8 @@ exports.createProfileImageUpload = (req, res) => {
   const storage = new GridFsStorage({
     url: process.env.ATLAS_URI,
     file: (req, file) => {
-      if (file.mimetype !== "image/png" || file.mimetype !== "image/jpeg") {
+      console.log(file.mimetype);
+      if (file.mimetype !== "image/png" && file.mimetype !== "image/jpeg") {
         throw "Error: File must be jpg or png";
       }
       return new Promise((resolve, reject) => {
