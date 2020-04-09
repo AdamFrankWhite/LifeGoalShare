@@ -17,7 +17,7 @@ mongoose.connect(dbURI, {
   useUnifiedTopology: true,
   useCreateIndex: true,
   useNewUrlParser: true,
-  useFindAndModify: false
+  useFindAndModify: false,
 });
 
 const connection = mongoose.connection;
@@ -35,10 +35,14 @@ app.use(express.json());
 const usersRouter = require("./routes/users.js");
 const lifegoalsRouter = require("./routes/lifegoals.js");
 
+//TODO - session/passport for db user restrictions to database
+
 // Routes
 
 app.use("/users", usersRouter);
 app.use("/lifegoals", verifyToken, lifegoalsRouter);
+
+//TODO - pass verifyToken to users, clean up userFunctions
 
 app.listen(port, () => {
   console.log(`Server is up and running on port ${port}`);

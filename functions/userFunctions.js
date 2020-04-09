@@ -22,8 +22,8 @@ connection.once("open", () => {
 //GET
 exports.getAllUsers = (req, res) => {
   User.find()
-    .then(users => res.json(users))
-    .catch(err => res.status(400).json("Error:" + err));
+    .then((users) => res.json(users))
+    .catch((err) => res.status(400).json("Error:" + err));
 };
 
 //POST
@@ -33,7 +33,7 @@ exports.signup = (req, res) => {
     password,
     confirmPassword,
     email,
-    profileImageUrl
+    profileImageUrl,
   } = req.body;
   const imgUrl = profileImageUrl ? profileImageUrl : "PLACEHOLDER_IMAGE_URL";
   const errorMessage = {};
@@ -41,16 +41,15 @@ exports.signup = (req, res) => {
     const newUser = new User({
       username,
       password,
-      confirmPassword,
       email,
-      profileImageUrl: imgUrl
+      profileImageUrl: imgUrl,
     });
-    bcrypt.hash(password, 10, function(err, hash) {
+    bcrypt.hash(password, 10, function (err, hash) {
       newUser.password = hash;
       newUser
         .save()
         .then(() => res.json(`${username} signed up successfully!`))
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
           let errorMessage;
           res.status(400);
@@ -108,7 +107,7 @@ exports.signup = (req, res) => {
 exports.login = (req, res) => {
   const user = {
     username: req.body.username,
-    password: req.body.password
+    password: req.body.password,
   };
   //Authentication
   User.authenticate(user.username, user.password, (error, user) => {
@@ -152,12 +151,12 @@ exports.createProfileImageUpload = (req, res) => {
             buf.toString("hex") + path.extname(file.originalname);
           const fileInfo = {
             filename: filename,
-            bucketName: "uploads"
+            bucketName: "uploads",
           };
           resolve(fileInfo);
         });
       });
-    }
+    },
   });
   return multer({ storage });
 };
@@ -196,10 +195,13 @@ exports.showImageFile = (req, res) => {
     }
   });
 };
-
+//POST
 exports.setProfileImage = (req, res) => {
   const { userID, profileImageUrl } = req.body;
 
+  if (userID !== "userCredentials.id") {
+    return res.status(403).json("Forbidden");
+  }
   User.findOneAndUpdate(
     { _id: userID },
     { $set: { profileImageUrl: profileImageUrl } },
@@ -227,4 +229,17 @@ exports.updateUserDetails = (req, res) => {
       res.json(user);
     }
   );
+};
+
+exports.getAuthenticatedUser = (req, res) => {
+  let userData = {};
+  User.findOne({ _id: req.body.userID })
+    .then((user) => {
+      console.log(user);
+      userData.ownLifeGoals = user.ownLifeGoals;
+      userData.messages = user.messages;
+      userData.lifeGoalsFollowed = user.lifeGoalsFollowed;
+      res.json(userData);
+    })
+    .catch((err) => res.json(err));
 };

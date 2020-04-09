@@ -9,47 +9,53 @@ const userSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      minLength: 6
+      minLength: 6,
     },
     password: {
       type: String,
       required: true,
       unique: true,
       trim: true,
-      minLength: 6
-    },
-    confirmPassword: {
-      type: String,
-      required: true,
-      trim: true,
-      minLength: 6
+      minLength: 6,
     },
     email: {
       type: String,
       required: true,
       unique: true,
       trim: true,
-      minLength: 6
+      minLength: 6,
     },
     profileImageUrl: {
       type: String,
       trim: true,
-      minLength: 6
+      minLength: 6,
     },
     profile: {
       type: Object,
       unique: true,
       trim: true,
-      minLength: 6
+      minLength: 6,
     },
     location: {
       type: String,
       trim: true,
-      minLength: 6
-    }
+      minLength: 6,
+    },
+    ownLifeGoals: {
+      type: Array,
+      trim: true,
+    },
+    messages: {
+      type: Array,
+      trim: true,
+    },
+    lifeGoalsFollowed: {
+      type: Array,
+      trim: true,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 

@@ -8,7 +8,8 @@ const {
   getProfileImageFile,
   showImageFile,
   updateUserDetails,
-  setProfileImage
+  setProfileImage,
+  getAuthenticatedUser,
 } = require("../functions/userFunctions");
 
 const verifyToken = require("../functions/verifyToken");
@@ -25,6 +26,7 @@ router.route("/profile/update/img").post(verifyToken, setProfileImage);
 router
   .route("/profile")
   .post(verifyToken, ProfileImageUpload, uploadProfileImage);
+router.route("/profile/get").get(verifyToken, getAuthenticatedUser);
 router.route("/profile/files/:filename").get(verifyToken, getProfileImageFile);
 router.route("/profile/image/:filename").get(verifyToken, showImageFile);
 
