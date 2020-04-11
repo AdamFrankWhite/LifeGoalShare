@@ -30,9 +30,13 @@ exports.addLifeGoal = (req, res) => {
   //Update User's ownLifeGoals (function avoids async issues)
 
   function addToOwnLifeGoals() {
+    let newLifeGoalData = {
+      newLifeGoalID,
+      createdOn: new Date(),
+    };
     User.findOneAndUpdate(
       { _id: createdBy },
-      { $addToSet: { ownLifeGoals: newLifeGoalID } },
+      { $addToSet: { ownLifeGoals: newLifeGoalData } },
       { new: true },
       (err, user) => {
         if (err) {
@@ -82,11 +86,14 @@ exports.deleteLifeGoal = (req, res) => {
 
 exports.followLifeGoal = (req, res) => {
   const { userID, lifeGoalID } = req.body;
-
+  let followLifeGoalData = {
+    lifeGoalID,
+    dateFollowed: new Date(),
+  };
   // Add follow ref to UserData
   User.findOneAndUpdate(
     { _id: userID },
-    { $addToSet: { lifeGoalsFollowed: lifeGoalID } },
+    { $addToSet: { lifeGoalsFollowed: followLifeGoalData } },
     { new: true },
     (err) => {
       if (err) {
@@ -96,9 +103,13 @@ exports.followLifeGoal = (req, res) => {
   );
 
   // Add follower to lifeGoal
+  let followerData = {
+    followerID: userID,
+    dateFollowed: new Date(),
+  };
   LifeGoal.findOneAndUpdate(
     { _id: lifeGoalID },
-    { $addToSet: { followers: userID } },
+    { $addToSet: { followers: followerData } },
     { new: true },
     (err, lifeGoal) => {
       if (err) {
@@ -111,5 +122,7 @@ exports.followLifeGoal = (req, res) => {
 };
 
 //TODO - followLifeGoal - add ref to users, add follower to lifeGoal - which router to place in? DONE
-// TODO - addLifeGoal - add ref to users
+// TODO - addLifeGoal - add ref to users DONE
+//TODO - addComment, deleteComment
+
 // TODO - deleteLifeGoal - delete ref to users
