@@ -121,8 +121,37 @@ exports.followLifeGoal = (req, res) => {
   );
 };
 
+//Add comment
+
+exports.postComment = (req, res) => {
+  const { lifeGoalID, userID, comment } = req.body;
+
+  if (lifeGoalID && userID && comment) {
+    let userComment = {
+      userID: userID,
+      comment: comment,
+      createdOn: new Date(),
+    };
+
+    LifeGoal.findOneAndUpdate(
+      { _id: lifeGoalID },
+      { $addToSet: { comments: userComment } },
+      { new: true },
+      (err, lifeGoal) => {
+        if (err) {
+          res.json(err);
+        } else {
+          res.json(lifeGoal);
+        }
+      }
+    );
+  }
+};
+
+exports.editComment = (req, res) => {};
 //TODO - followLifeGoal - add ref to users, add follower to lifeGoal - which router to place in? DONE
 // TODO - addLifeGoal - add ref to users DONE
 //TODO - addComment, deleteComment
 
 // TODO - deleteLifeGoal - delete ref to users
+//TODO - FRONT END - socket.io to listen for changes to data, e.g. if logged in and another user updates goal or comments/messages you
