@@ -20,5 +20,5 @@ router.route("/follow").post(verifyToken, followLifeGoal);
 router.route("/unfollow").post(verifyToken, unfollowLifeGoal);
 router.route("/comment/post").post(verifyToken, postNewComment);
 router.route("/comment/delete").post(verifyToken, deleteComment);
-router.route("/comment/reply").post(verifyToken, postCommentReply);
+router.route("/comment/post/reply").post(verifyToken, postCommentReply);
 module.exports = router;

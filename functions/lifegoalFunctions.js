@@ -175,14 +175,13 @@ exports.postNewComment = (req, res) => {
   const commentID = new ObjectId().toString();
   const newDate = new Date();
   if (lifeGoalID && userID && comment) {
-    let userComment = [
-      {
-        userID: userID,
-        commentID: commentID,
-        comment: comment,
-        createdAt: newDate,
-      },
-    ];
+    let userComment = {
+      userID: userID,
+      commentID: commentID,
+      comment: comment,
+      createdAt: newDate,
+      replies: [],
+    };
 
     LifeGoal.findOneAndUpdate(
       { _id: lifeGoalID },
@@ -253,42 +252,88 @@ exports.deleteComment = (req, res) => {
 };
 
 exports.postCommentReply = (req, res) => {
-  //TODO
-  const { userID, lifeGoalID, commentID, reply } = req.body;
-  const replyID = new ObjectId();
+  const { lifeGoalID, userID, commentID, comment } = req.body;
+  const newCommentID = new ObjectId().toString();
   const newDate = new Date();
-  const myReply = {
-    userID,
-    // lifeGoalID,
-    repliedToComment: commentID,
-    replyID,
-    reply,
-    createdAt: newDate,
-  };
+  if (lifeGoalID && userID && comment) {
+    let userReply = {
+      userID: userID,
+      commentID: newCommentID,
+      comment: comment,
+      createdAt: newDate,
+      replies: [],
+    };
 
-  LifeGoal.findOneAndUpdate(
-    { _id: ObjectId(lifeGoalID) },
-    { $addToSet: { "comments.$.replies": myReply } }, // TOCHANGE
+    LifeGoal.findOneAndUpdate(
+      { _id: new ObjectId(lifeGoalID), "comments.commentID": commentID },
+      { $addToSet: { "comments.$.replies": userReply } },
+      { new: true },
+      (err, lifeGoal) => {
+        if (err) {
+          res.json(err);
+        }
 
-    (err, user) => {
-      if (err) {
-        res.json(err);
+        // else {
+        //   res.json(lifeGoal);
+        // }
       }
-      // TRY ADDING ERROR TO OBJECT, THEN PASS ERROR OBJECY IN FINAL RES
-    }
-  );
-  User.findOneAndUpdate(
-    { _id: ObjectId(userID) },
-    { $addToSet: { myComments: { replyID, createdAt: newDate } } },
-    { new: true },
-    (err, user) => {
-      if (err) {
-        res.json(err);
-      } else {
-        res.json(user);
+    );
+
+    let myReply = {
+      commentID: newCommentID,
+      createdAt: newDate,
+    };
+
+    User.findOneAndUpdate(
+      { _id: new ObjectId(userID), "myComments.commentID": commentID },
+      { $addToSet: { "myComments.$.replies": myReply } },
+      { new: true },
+      (err, user) => {
+        if (err) {
+          res.json(err);
+        } else {
+          res.json(user);
+        }
       }
-    }
-  );
+    );
+  }
+
+  // //TODO
+  // const { userID, lifeGoalID, commentID, reply } = req.body;
+  // const replyID = new ObjectId();
+  // const newDate = new Date();
+  // const myReply = {
+  //   userID,
+  //   // lifeGoalID,
+  //   repliedToComment: commentID,
+  //   replyID,
+  //   reply,
+  //   createdAt: newDate,
+  // };
+
+  // LifeGoal.findOneAndUpdate(
+  //   { _id: ObjectId(lifeGoalID) },
+  //   { $addToSet: { "comments.$.replies": myReply } }, // TOCHANGE
+
+  //   (err, user) => {
+  //     if (err) {
+  //       res.json(err);
+  //     }
+  //     // TRY ADDING ERROR TO OBJECT, THEN PASS ERROR OBJECY IN FINAL RES
+  //   }
+  // );
+  // User.findOneAndUpdate(
+  //   { _id: ObjectId(userID) },
+  //   { $addToSet: { myComments: { replyID, createdAt: newDate } } },
+  //   { new: true },
+  //   (err, user) => {
+  //     if (err) {
+  //       res.json(err);
+  //     } else {
+  //       res.json(user);
+  //     }
+  //   }
+  // );
 };
 exports.getComments = (req, res) => {};
 exports.editComment = (req, res) => {};
