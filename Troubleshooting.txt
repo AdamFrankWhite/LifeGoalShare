@@ -1,0 +1,1 @@
+updating a nested document proved tricked, cast to string, ids being passed as string or sometimes objects

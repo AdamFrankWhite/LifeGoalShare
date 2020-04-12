@@ -136,11 +136,43 @@ exports.followLifeGoal = (req, res) => {
   );
 };
 
+exports.unfollowLifeGoal = (req, res) => {
+  //Update UserData
+
+  const { followerID, lifeGoalID } = req.body;
+  User.findOneAndUpdate(
+    { _id: new ObjectId(followerID) },
+    { $pull: { lifeGoalsFollowed: { lifeGoalID: lifeGoalID } } }, // Works, what apart exec delete?
+    { safe: true },
+    (err, user) => {
+      if (err) {
+        res.json(err);
+      }
+      // else {
+      //   res.json(user);
+      // }
+    }
+  );
+
+  // Update lifegoal
+  LifeGoal.findOneAndUpdate(
+    { _id: new ObjectId(lifeGoalID) }, // To be clear ======> When querying main collection with id, it needs to be an object. However, if you created ids, then string is to be expected
+    { $pull: { followers: { followerID: followerID } } },
+    { safe: true },
+    (err, lifeGoal) => {
+      if (err) {
+        res.json(err);
+      } else {
+        res.json(lifeGoal);
+      }
+    }
+  );
+};
 //Add comment
 
 exports.postNewComment = (req, res) => {
   const { lifeGoalID, userID, comment } = req.body;
-  const commentID = new ObjectId();
+  const commentID = new ObjectId().toString();
   const newDate = new Date();
   if (lifeGoalID && userID && comment) {
     let userComment = [
@@ -187,6 +219,39 @@ exports.postNewComment = (req, res) => {
   }
 };
 
+exports.deleteComment = (req, res) => {
+  //Update UserData
+
+  const { userID, commentID, lifeGoalID } = req.body;
+  User.findOneAndUpdate(
+    { _id: new ObjectId(userID) },
+    { $pull: { myComments: { commentID: commentID } } },
+    { safe: true },
+    (err, user) => {
+      if (err) {
+        res.json(err);
+      }
+      // else {
+      //   res.json(user);
+      // }
+    }
+  );
+
+  // Update lifegoal
+  LifeGoal.findOneAndUpdate(
+    { _id: new ObjectId(lifeGoalID) }, // To be clear ======> When querying main collection with id, it expects to be an object, as that is what your Schema is set to create. However, if you created ids, then string is to be expected. Pay attention to the method of id creation!
+    { $pull: { comments: { commentID: commentID } } },
+    { safe: true },
+    (err, lifeGoal) => {
+      if (err) {
+        res.json(err);
+      } else {
+        res.json(lifeGoal);
+      }
+    }
+  );
+};
+
 exports.postCommentReply = (req, res) => {
   //TODO
   const { userID, lifeGoalID, commentID, reply } = req.body;
@@ -198,12 +263,12 @@ exports.postCommentReply = (req, res) => {
     repliedToComment: commentID,
     replyID,
     reply,
-    createdAt: new Date(),
+    createdAt: newDate,
   };
 
   LifeGoal.findOneAndUpdate(
-    { _id: lifeGoalID },
-    { $addToSet: { comments: myReply } }, // TOCHANGE
+    { _id: ObjectId(lifeGoalID) },
+    { $addToSet: { "comments.$.replies": myReply } }, // TOCHANGE
 
     (err, user) => {
       if (err) {
@@ -213,7 +278,7 @@ exports.postCommentReply = (req, res) => {
     }
   );
   User.findOneAndUpdate(
-    { _id: userID },
+    { _id: ObjectId(userID) },
     { $addToSet: { myComments: { replyID, createdAt: newDate } } },
     { new: true },
     (err, user) => {
@@ -227,8 +292,6 @@ exports.postCommentReply = (req, res) => {
 };
 exports.getComments = (req, res) => {};
 exports.editComment = (req, res) => {};
-exports.deleteComment = (req, res) => {};
-exports.unfollowLifeGoal = (req, res) => {};
 //TODO - followLifeGoal - add ref to users, add follower to lifeGoal - which router to place in? DONE
 // TODO - addLifeGoal - add ref to users DONE
 //TODO - addComment, deleteComment
