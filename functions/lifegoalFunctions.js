@@ -2,7 +2,7 @@ const LifeGoal = require("../models/lifegoal.model");
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-const randomID = mongoose.Types.ObjectId();
+const ObjectId = mongoose.Types.ObjectId;
 
 exports.getLifeGoals = (req, res) => {
   LifeGoal.find()
@@ -12,7 +12,7 @@ exports.getLifeGoals = (req, res) => {
 
 exports.addLifeGoal = (req, res) => {
   const { lifeGoalName, lifeGoalDescription, createdBy, followers } = req.body;
-
+  let lifeGoalID;
   const lifeGoal = new LifeGoal({
     lifeGoalName,
     lifeGoalDescription,
@@ -22,8 +22,8 @@ exports.addLifeGoal = (req, res) => {
   lifeGoal
     .save()
     .then((data) => {
-      lifeGoalID = data._id.toString();
-      console.log(lifeGoalID);
+      lifeGoalID = data._id;
+      console.log(typeof lifeGoalID);
       addToOwnLifeGoals();
       // res.json(data)
     })
@@ -62,40 +62,39 @@ exports.deleteLifeGoal = (req, res) => {
       // TODO --- if lifegoal deleted, leave history of it?
     }
   });
-  const { lifeGoalID } = req.params.id;
+  const { userID, lifeGoalID } = req.body;
   User.findOneAndUpdate(
-    { _id: lifeGoalID },
-    { $pull: { ownLifeGoals: { lifeGoalID: lifeGoalID } } },
-    { new: true },
+    { _id: new ObjectId(userID) },
+    { $pull: { ownLifeGoals: { lifeGoalID: new ObjectId(lifeGoalID) } } }, // believe rest works, but still not pulling
+    { safe: true },
     (err, user) => {
       if (err) {
         res.json(err);
+      } else {
+        res.json(user);
       }
-      // else {
-      //   res.json(user);
-      // }
     }
   );
 
-  // Find lifegoal
-  LifeGoal.findOne({ lifeGoalID })
-    // TODO: Error handle not found
-    .then((lifegoal) => {
-      lifeGoalCreator = lifegoal.createdBy;
-    })
-    .then((data) => {
-      //Check if lifegoal was created by user. If so, delete
-      if (loggedInUser == lifeGoalCreator) {
-        LifeGoal.findOneAndDelete({ lifeGoalID })
-          .exec()
-          .then((lifegoal) =>
-            res.json(`"${lifegoal.lifeGoalName}" has been deleted`)
-          )
-          .catch((err) => res.json(err));
-      } else {
-        res.json("Access denied");
-      }
-    });
+  // // Find lifegoal
+  // LifeGoal.findOne({ lifeGoalID })
+  //   // TODO: Error handle not found
+  //   .then((lifegoal) => {
+  //     lifeGoalCreator = lifegoal.createdBy;
+  //   })
+  //   .then((data) => {
+  //     //Check if lifegoal was created by user. If so, delete
+  //     if (loggedInUser == lifeGoalCreator) {
+  //       LifeGoal.findOneAndDelete({ lifeGoalID })
+  //         .exec()
+  //         .then((lifegoal) =>
+  //           res.json(`"${lifegoal.lifeGoalName}" has been deleted`)
+  //         )
+  //         .catch((err) => res.json(err));
+  //     } else {
+  //       res.json("Access denied");
+  //     }
+  //   });
 };
 
 exports.followLifeGoal = (req, res) => {
@@ -138,7 +137,7 @@ exports.followLifeGoal = (req, res) => {
 
 exports.postNewComment = (req, res) => {
   const { lifeGoalID, userID, comment } = req.body;
-  const commentID = randomID;
+  const commentID = new ObjectId();
   const newDate = new Date();
   if (lifeGoalID && userID && comment) {
     let userComment = [
@@ -188,7 +187,7 @@ exports.postNewComment = (req, res) => {
 exports.postCommentReply = (req, res) => {
   //TODO
   const { userID, lifeGoalID, commentID, reply } = req.body;
-  const replyID = randomID;
+  const replyID = new ObjectId();
   const newDate = new Date();
   const myReply = {
     userID,

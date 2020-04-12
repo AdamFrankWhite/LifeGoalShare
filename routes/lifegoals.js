@@ -13,7 +13,7 @@ const {
 // Routes
 router.route("/").get(getLifeGoals);
 router.route("/add").post(addLifeGoal);
-router.route("/delete/:id").delete(deleteLifeGoal);
+router.route("/delete").delete(deleteLifeGoal);
 router.route("/follow").post(verifyToken, followLifeGoal);
 router.route("/comment/post").post(verifyToken, postNewComment);
 router.route("/comment/reply").post(verifyToken, postCommentReply);
