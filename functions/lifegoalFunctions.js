@@ -65,36 +65,39 @@ exports.deleteLifeGoal = (req, res) => {
   const { userID, lifeGoalID } = req.body;
   User.findOneAndUpdate(
     { _id: new ObjectId(userID) },
-    { $pull: { ownLifeGoals: { lifeGoalID: new ObjectId(lifeGoalID) } } }, // believe rest works, but still not pulling
+    { $pull: { ownLifeGoals: { lifeGoalID: new ObjectId(lifeGoalID) } } }, // Works, what apart exec delete?
     { safe: true },
     (err, user) => {
       if (err) {
         res.json(err);
-      } else {
-        res.json(user);
       }
+      // else {
+      //   res.json(user);
+      // }
     }
   );
 
-  // // Find lifegoal
-  // LifeGoal.findOne({ lifeGoalID })
-  //   // TODO: Error handle not found
-  //   .then((lifegoal) => {
-  //     lifeGoalCreator = lifegoal.createdBy;
-  //   })
-  //   .then((data) => {
-  //     //Check if lifegoal was created by user. If so, delete
-  //     if (loggedInUser == lifeGoalCreator) {
-  //       LifeGoal.findOneAndDelete({ lifeGoalID })
-  //         .exec()
-  //         .then((lifegoal) =>
-  //           res.json(`"${lifegoal.lifeGoalName}" has been deleted`)
-  //         )
-  //         .catch((err) => res.json(err));
-  //     } else {
-  //       res.json("Access denied");
-  //     }
-  //   });
+  // Find lifegoal
+  LifeGoal.findOne({ _id: lifeGoalID })
+    // TODO: Error handle not found
+    .then((lifegoal) => {
+      lifeGoalCreator = lifegoal.createdBy;
+      console.log("boo");
+    })
+    .then((data) => {
+      //Check if lifegoal was created by user. If so, delete
+      if (loggedInUser == lifeGoalCreator) {
+        console.log("boo2");
+        LifeGoal.findOneAndDelete({ _id: lifeGoalID })
+          .exec()
+          .then((lifegoal) =>
+            res.json(`"${lifegoal.lifeGoalName}" has been deleted`)
+          )
+          .catch((err) => res.json(err));
+      } else {
+        res.json("Access denied");
+      }
+    });
 };
 
 exports.followLifeGoal = (req, res) => {
