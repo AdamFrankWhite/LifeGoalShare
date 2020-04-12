@@ -264,16 +264,9 @@ exports.postCommentReply = (req, res) => {
       createdAt: newDate,
       replies: [],
     };
-    // Algorithm to get correct nesting query
-    let commentsDepth = "comments.";
-    for (let i = 0; i < commentLevel; i++) {
-      commentsDepth += "commentID.";
-    }
+
     LifeGoal.findOneAndUpdate(
-      {
-        _id: new ObjectId(lifeGoalID),
-        [`${commentsDepth + "commentID"}`]: commentID,
-      },
+      { _id: new ObjectId(lifeGoalID), "comments.commentID": commentID },
       { $addToSet: { "comments.$.replies": userReply } },
       { new: true },
       (err, lifeGoal) => {
@@ -292,15 +285,8 @@ exports.postCommentReply = (req, res) => {
       createdAt: newDate,
     };
 
-    let myCommentsDepth = "myComments.";
-    for (let i = 0; i < commentLevel; i++) {
-      myCommentsDepth += "commentID.";
-    }
     User.findOneAndUpdate(
-      {
-        _id: new ObjectId(userID),
-        [`${myCommentsDepth + "commentID"}`]: commentID,
-      },
+      { _id: new ObjectId(userID), "myComments.commentID": commentID },
       { $addToSet: { "myComments.$.replies": myReply } },
       { new: true },
       (err, user) => {
