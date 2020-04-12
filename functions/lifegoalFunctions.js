@@ -1,6 +1,8 @@
 const LifeGoal = require("../models/lifegoal.model");
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+const randomID = mongoose.Types.ObjectId();
 
 exports.getLifeGoals = (req, res) => {
   LifeGoal.find()
@@ -21,7 +23,7 @@ exports.addLifeGoal = (req, res) => {
     .save()
     .then((data) => {
       console.log(data);
-      newLifeGoalID = data._id;
+      lifeGoalID = data._id;
       addToOwnLifeGoals();
       // res.json(data)
     })
@@ -31,7 +33,7 @@ exports.addLifeGoal = (req, res) => {
 
   function addToOwnLifeGoals() {
     let newLifeGoalData = {
-      newLifeGoalID,
+      lifeGoalID,
       createdOn: new Date(),
     };
     User.findOneAndUpdate(
@@ -101,7 +103,6 @@ exports.followLifeGoal = (req, res) => {
       }
     }
   );
-
   // Add follower to lifeGoal
   let followerData = {
     followerID: userID,
@@ -123,15 +124,19 @@ exports.followLifeGoal = (req, res) => {
 
 //Add comment
 
-exports.postComment = (req, res) => {
+exports.postNewComment = (req, res) => {
   const { lifeGoalID, userID, comment } = req.body;
-
+  const commentID = randomID;
   if (lifeGoalID && userID && comment) {
-    let userComment = {
-      userID: userID,
-      comment: comment,
-      createdOn: new Date(),
-    };
+    let userComment = [
+      {
+        userID: userID,
+        commentID: commentID,
+        comment: comment,
+        replies: [],
+        createdAt: new Date(),
+      },
+    ];
 
     LifeGoal.findOneAndUpdate(
       { _id: lifeGoalID },
@@ -140,12 +145,75 @@ exports.postComment = (req, res) => {
       (err, lifeGoal) => {
         if (err) {
           res.json(err);
+        }
+
+        // else {
+        //   res.json(lifeGoal);
+        // }
+      }
+    );
+
+    let myComment = {
+      commentID: commentID,
+      createdAt: new Date(),
+    };
+
+    User.findOneAndUpdate(
+      { _id: userID },
+      { $addToSet: { myComments: myComment } },
+      { new: true },
+      (err, user) => {
+        if (err) {
+          res.json(err);
         } else {
-          res.json(lifeGoal);
+          res.json(user);
         }
       }
     );
   }
+};
+
+exports.postCommentReply = (req, res) => {
+  //TODO
+  const { userID, lifeGoalID, commentID, reply } = req.body;
+  const replyID = randomID;
+  const myReply = {
+    userID,
+    lifeGoalID,
+    commentID,
+    replyID,
+    reply,
+    createdAt: new Date(),
+  };
+
+  LifeGoal.findOneAndUpdate(
+    { _id: lifeGoalID },
+    { "comments.replies.$addToSet": myReply }, // TOCHANGE
+
+    { new: true },
+    (err, user) => {
+      if (err) {
+        res.json(err);
+      }
+      // else {
+      //   res.json(user);
+      // }
+      // TRY ADDING ERROR TO OBJECT, THEN PASS ERROR OBJECY IN FINAL RES
+    }
+  );
+
+  User.findOneAndUpdate(
+    { _id: userID },
+    { $addToSet: { myComments: { replyID, createdAt: new Date() } } },
+    { new: true },
+    (err, user) => {
+      if (err) {
+        res.json(err);
+      } else {
+        res.json(user);
+      }
+    }
+  );
 };
 
 exports.editComment = (req, res) => {};

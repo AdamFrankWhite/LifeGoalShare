@@ -6,7 +6,8 @@ const {
   addLifeGoal,
   deleteLifeGoal,
   followLifeGoal,
-  postComment,
+  postNewComment,
+  postCommentReply,
 } = require("../functions/lifegoalFunctions");
 
 // Routes
@@ -14,5 +15,6 @@ router.route("/").get(getLifeGoals);
 router.route("/add").post(addLifeGoal);
 router.route("/delete/:id").delete(deleteLifeGoal);
 router.route("/follow").post(verifyToken, followLifeGoal);
-router.route("/comment/post").post(verifyToken, postComment);
+router.route("/comment/post").post(verifyToken, postNewComment);
+router.route("/comment/reply").post(verifyToken, postCommentReply);
 module.exports = router;

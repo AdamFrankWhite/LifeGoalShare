@@ -53,6 +53,10 @@ const userSchema = new Schema(
       type: Array,
       trim: true,
     },
+    myComments: {
+      type: Array,
+      trim: true,
+    },
   },
   {
     timestamps: true,

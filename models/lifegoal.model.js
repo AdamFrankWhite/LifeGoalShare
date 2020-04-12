@@ -8,31 +8,32 @@ const lifeGoalSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      minLength: 6
+      minLength: 6,
     },
     lifeGoalDescription: {
       type: String,
       required: true,
       unique: true,
       trim: true,
-      minLength: 6
+      minLength: 6,
     },
     createdBy: {
       type: String,
       required: true,
       trim: true,
-      minLength: 6
+      minLength: 6,
     },
     followers: {
       type: Array,
-      required: true
+      required: true,
     },
     comments: {
-      type: Array
-    }
+      type: Array,
+      trim: true,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
