@@ -40,7 +40,7 @@ const lifegoalsRouter = require("./routes/lifegoals.js");
 // Routes
 
 app.use("/users", usersRouter);
-app.use("/lifegoals", verifyToken, lifegoalsRouter);
+app.use("/lifegoals", lifegoalsRouter);
 
 //TODO - pass verifyToken to users, clean up userFunctions
 
