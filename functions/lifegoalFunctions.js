@@ -252,7 +252,7 @@ exports.deleteComment = (req, res) => {
 };
 
 exports.postCommentReply = (req, res) => {
-  const { lifeGoalID, userID, commentID, comment } = req.body;
+  const { lifeGoalID, userID, commentID, comment, commentLevel } = req.body;
   const newCommentID = new ObjectId().toString();
   const newDate = new Date();
   if (lifeGoalID && userID && comment) {
@@ -260,12 +260,20 @@ exports.postCommentReply = (req, res) => {
       userID: userID,
       commentID: newCommentID,
       comment: comment,
+      commentLevel: commentLevel,
       createdAt: newDate,
       replies: [],
     };
-
+    // Algorithm to get correct nesting query
+    let commentsDepth = "comments.";
+    for (let i = 0; i < commentLevel; i++) {
+      commentsDepth += "commentID.";
+    }
     LifeGoal.findOneAndUpdate(
-      { _id: new ObjectId(lifeGoalID), "comments.commentID": commentID },
+      {
+        _id: new ObjectId(lifeGoalID),
+        [`${commentsDepth + "commentID"}`]: commentID,
+      },
       { $addToSet: { "comments.$.replies": userReply } },
       { new: true },
       (err, lifeGoal) => {
@@ -284,8 +292,15 @@ exports.postCommentReply = (req, res) => {
       createdAt: newDate,
     };
 
+    let myCommentsDepth = "myComments.";
+    for (let i = 0; i < commentLevel; i++) {
+      myCommentsDepth += "commentID.";
+    }
     User.findOneAndUpdate(
-      { _id: new ObjectId(userID), "myComments.commentID": commentID },
+      {
+        _id: new ObjectId(userID),
+        [`${myCommentsDepth + "commentID"}`]: commentID,
+      },
       { $addToSet: { "myComments.$.replies": myReply } },
       { new: true },
       (err, user) => {
@@ -297,43 +312,6 @@ exports.postCommentReply = (req, res) => {
       }
     );
   }
-
-  // //TODO
-  // const { userID, lifeGoalID, commentID, reply } = req.body;
-  // const replyID = new ObjectId();
-  // const newDate = new Date();
-  // const myReply = {
-  //   userID,
-  //   // lifeGoalID,
-  //   repliedToComment: commentID,
-  //   replyID,
-  //   reply,
-  //   createdAt: newDate,
-  // };
-
-  // LifeGoal.findOneAndUpdate(
-  //   { _id: ObjectId(lifeGoalID) },
-  //   { $addToSet: { "comments.$.replies": myReply } }, // TOCHANGE
-
-  //   (err, user) => {
-  //     if (err) {
-  //       res.json(err);
-  //     }
-  //     // TRY ADDING ERROR TO OBJECT, THEN PASS ERROR OBJECY IN FINAL RES
-  //   }
-  // );
-  // User.findOneAndUpdate(
-  //   { _id: ObjectId(userID) },
-  //   { $addToSet: { myComments: { replyID, createdAt: newDate } } },
-  //   { new: true },
-  //   (err, user) => {
-  //     if (err) {
-  //       res.json(err);
-  //     } else {
-  //       res.json(user);
-  //     }
-  //   }
-  // );
 };
 exports.getComments = (req, res) => {};
 exports.editComment = (req, res) => {};
