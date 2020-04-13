@@ -199,7 +199,7 @@ exports.postNewComment = (req, res) => {
     );
 
     let myComment = {
-      commentID: commentID,
+      commentIdRef: commentID,
       createdAt: newDate,
     };
 
@@ -224,7 +224,7 @@ exports.deleteComment = (req, res) => {
   const { userID, commentID, lifeGoalID } = req.body;
   User.findOneAndUpdate(
     { _id: new ObjectId(userID) },
-    { $pull: { myComments: { commentID: commentID } } },
+    { $pull: { myComments: { commentIdRef: commentID } } },
     { safe: true },
     (err, user) => {
       if (err) {
@@ -251,56 +251,84 @@ exports.deleteComment = (req, res) => {
   );
 };
 
-exports.postCommentReply = (req, res) => {
-  const { lifeGoalID, userID, commentID, comment, commentLevel } = req.body;
-  const newCommentID = new ObjectId().toString();
-  const newDate = new Date();
-  if (lifeGoalID && userID && comment) {
-    let userReply = {
-      userID: userID,
-      commentID: newCommentID,
-      comment: comment,
-      commentLevel: commentLevel,
-      createdAt: newDate,
-      replies: [],
-    };
+// exports.postCommentReply = (req, res) => {
+//   const { lifeGoalID, userID, commentID, comment, commentLevel } = req.body;
+//   const newCommentID = new ObjectId().toString();
+//   const newDate = new Date();
+//   if (lifeGoalID && userID && comment) {
+//     let userReply = {
+//       userID: userID,
+//       commentID: newCommentID,
+//       comment: comment,
+//       commentLevel: commentLevel,
+//       createdAt: newDate,
+//       replies: [],
+//     };
 
-    LifeGoal.findOneAndUpdate(
-      { _id: new ObjectId(lifeGoalID), "comments.commentID": commentID },
-      { $addToSet: { "comments.$.replies": userReply } },
-      { new: true },
-      (err, lifeGoal) => {
-        if (err) {
-          res.json(err);
-        }
+//     LifeGoal.findOneAndUpdate(
+//       { _id: new ObjectId(lifeGoalID), "comments.commentID": commentID },
+//       { $addToSet: { "comments.$.replies": userReply } },
+//       { new: true },
+//       (err, lifeGoal) => {
+//         if (err) {
+//           res.json(err);
+//         }
 
-        // else {
-        //   res.json(lifeGoal);
-        // }
-      }
-    );
+//         // else {
+//         //   res.json(lifeGoal);
+//         // }
+//       }
+//     );
 
-    let myReply = {
-      commentID: newCommentID,
-      createdAt: newDate,
-    };
+//     let myReply = {
+//       commentID: newCommentID,
+//       createdAt: newDate,
+//     };
 
-    User.findOneAndUpdate(
-      { _id: new ObjectId(userID), "myComments.commentID": commentID },
-      { $addToSet: { "myComments.$.replies": myReply } },
-      { new: true },
-      (err, user) => {
-        if (err) {
-          res.json(err);
-        } else {
-          res.json(user);
-        }
-      }
-    );
-  }
+//     User.findOneAndUpdate(
+//       { _id: new ObjectId(userID), "myComments.commentID": commentID },
+//       { $addToSet: { "myComments.$.replies": myReply } },
+//       { new: true },
+//       (err, user) => {
+//         if (err) {
+//           res.json(err);
+//         } else {
+//           res.json(user);
+//         }
+//       }
+//     );
+//   }
+// };
+
+exports.getLifeGoalComments = (req, res) => {
+  const { lifeGoalID } = req.body;
+  LifeGoal.findOne({ _id: new ObjectId(lifeGoalID) })
+    .then((data) => {
+      res.json(data.comments);
+    })
+    .catch((err) => res.status(400).json(err));
 };
-exports.getComments = (req, res) => {};
-exports.editComment = (req, res) => {};
+
+exports.editComment = (req, res) => {
+  const { commentID, updatedComment, lifeGoalID } = req.body;
+  LifeGoal.findOneAndUpdate(
+    { _id: new ObjectId(lifeGoalID), "comments.commentID": commentID },
+    {
+      $set: {
+        "comments.$.comment": updatedComment,
+        "comments.$.createdAt": new Date(),
+      },
+    },
+    { new: true },
+    (err, lifeGoal) => {
+      if (err) {
+        res.json(err);
+      } else {
+        res.json(lifeGoal);
+      }
+    }
+  );
+};
 //TODO - followLifeGoal - add ref to users, add follower to lifeGoal - which router to place in? DONE
 // TODO - addLifeGoal - add ref to users DONE
 //TODO - addComment, deleteComment

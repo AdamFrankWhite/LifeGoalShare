@@ -232,14 +232,9 @@ exports.updateUserDetails = (req, res) => {
 };
 
 exports.getAuthenticatedUser = (req, res) => {
-  let userData = {};
   User.findOne({ _id: req.body.userID })
     .then((user) => {
-      console.log(user);
-      userData.ownLifeGoals = user.ownLifeGoals;
-      userData.messages = user.messages;
-      userData.lifeGoalsFollowed = user.lifeGoalsFollowed;
-      res.json(userData);
+      res.json(user);
     })
     .catch((err) => res.json(err));
 };
