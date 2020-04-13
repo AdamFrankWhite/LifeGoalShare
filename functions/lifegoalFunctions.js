@@ -171,16 +171,16 @@ exports.unfollowLifeGoal = (req, res) => {
 //Add comment
 
 exports.postNewComment = (req, res) => {
-  const { lifeGoalID, userID, comment } = req.body;
+  const { lifeGoalID, userID, comment, parentComments } = req.body;
   const commentID = new ObjectId().toString();
   const newDate = new Date();
   if (lifeGoalID && userID && comment) {
     let userComment = {
-      userID: userID,
       commentID: commentID,
+      author: userID,
       comment: comment,
+      parents: !parentComments ? [] : parentComments,
       createdAt: newDate,
-      replies: [],
     };
 
     LifeGoal.findOneAndUpdate(
