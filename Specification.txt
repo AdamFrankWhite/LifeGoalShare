@@ -4,9 +4,9 @@ Project Goal:
 create real-time social media app sharing user life goals
 
 Features:
-comment section
+comment
 personal messages
-post
+posts with comments
 
 
 Order of execution:
@@ -21,5 +21,6 @@ created backend functions
 
 
 TODO
+search goals/posts
 user restriction
 user session

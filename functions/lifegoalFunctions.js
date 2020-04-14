@@ -80,7 +80,7 @@ exports.deleteLifeGoal = (req, res) => {
   // Grab username from JWT
   let loggedInUser = "";
   // Grab lifegoal createdBy value
-  let lifeGoalCreator = "";
+
   jwt.verify(req.headers.authorization, "secret_key", (err, authData) => {
     if (err) {
       res.sendStatus(403);
@@ -98,12 +98,13 @@ exports.deleteLifeGoal = (req, res) => {
       if (err) {
         res.json(err);
       }
+
       // else {
       //   res.json(user);
       // }
     }
   );
-
+  let lifeGoalCreator = "";
   // Find lifegoal
   LifeGoal.findOne({ _id: lifeGoalID })
     // TODO: Error handle not found
@@ -159,6 +160,8 @@ exports.addNewPost = (req, res) => {
     (err, lifeGoal) => {
       if (err) {
         res.json(err);
+      } else if (lifeGoal === null) {
+        res.json("lifeGoal does not exist");
       } else {
         res.json(lifeGoal);
       }
@@ -166,7 +169,47 @@ exports.addNewPost = (req, res) => {
   );
 };
 
-// TODO - deletepost, commentonpost
+exports.deletePost = (req, res) => {
+  const { userID, lifeGoalID, postID } = req.body;
+  // Grab username from JWT
+  let loggedInUser = "";
+  // Grab lifegoal createdBy value
+
+  jwt.verify(req.headers.authorization, "secret_key", (err, authData) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      loggedInUser = authData.user._id;
+      // TODO --- if lifegoal deleted, leave history of it?
+    }
+  });
+
+  User.findOneAndUpdate(
+    { _id: ObjectId(userID) },
+    { $pull: { posts: { postID: ObjectId(postID) } } },
+    { safe: true },
+    (err, user) => {
+      if (err) {
+        res.json(err);
+      }
+      // else { res.json(user)}
+    }
+  );
+
+  LifeGoal.findOneAndUpdate(
+    { _id: new ObjectId(lifeGoalID) },
+    { $pull: { posts: { postID: ObjectId(postID) } } },
+    { safe: true },
+    (err, lifeGoal) => {
+      if (err) {
+        res.json(err);
+      } else {
+        res.json(lifeGoal);
+      }
+    }
+  );
+};
+// TODO - deletepost jwt verify, commentonpost, search lifegoals/posts
 
 exports.commentOnPost = (req, res) => {};
 
