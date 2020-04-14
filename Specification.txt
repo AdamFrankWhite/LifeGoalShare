@@ -1,0 +1,25 @@
+updating a nested document proved tricky, cast to string, ids being passed as string or sometimes objects
+
+Project Goal:
+create real-time social media app sharing user life goals
+
+Features:
+comment section
+personal messages
+post
+
+
+Order of execution:
+
+created database cluster
+created server
+connected database 
+created Schema
+created routes and router
+created JWT
+created backend functions
+
+
+TODO
+user restriction
+user session
