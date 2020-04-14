@@ -11,34 +11,61 @@ exports.getLifeGoals = (req, res) => {
 };
 
 exports.addLifeGoal = (req, res) => {
-  const { lifeGoalName, lifeGoalDescription, createdBy, followers } = req.body;
-  let lifeGoalID;
+  const {
+    lifeGoalName,
+    lifeGoalDescription,
+    createdBy,
+    followers,
+    initialPostData,
+  } = req.body;
+
+  const initialPost = {
+    postID: new ObjectId(),
+    postName: initialPostData.postName,
+    postContent: initialPostData.postContent,
+    createdBy: createdBy,
+    createdAt: new Date(),
+    comments: [],
+    postHeaderImage: initialPostData.postHeaderImage
+      ? initialPostData.postHeaderImage
+      : "PLACEHOLDER_HEADER_IMG",
+  };
+
   const lifeGoal = new LifeGoal({
     lifeGoalName,
     lifeGoalDescription,
     createdBy,
     followers,
+    posts: [initialPost],
   });
   lifeGoal
     .save()
     .then((data) => {
-      lifeGoalID = data._id;
+      let lifeGoalID = data._id;
       console.log(typeof lifeGoalID);
-      addToOwnLifeGoals();
+      addToOwnLifeGoals(lifeGoalID);
       // res.json(data)
     })
     .catch((err) => res.status(400).json("Error:" + err));
 
   //Update User's ownLifeGoals (function avoids async issues)
 
-  function addToOwnLifeGoals() {
+  function addToOwnLifeGoals(lifeGoalID) {
     let newLifeGoalData = {
-      lifeGoalID,
+      lifeGoalID: lifeGoalID,
       createdOn: new Date(),
     };
     User.findOneAndUpdate(
       { _id: createdBy },
-      { $addToSet: { ownLifeGoals: newLifeGoalData } },
+      {
+        $addToSet: {
+          ownLifeGoals: newLifeGoalData,
+          posts: {
+            postID: initialPost.postID,
+            createdAt: initialPost.createdAt,
+          },
+        },
+      },
       { new: true },
       (err, user) => {
         if (err) {
@@ -99,6 +126,49 @@ exports.deleteLifeGoal = (req, res) => {
       }
     });
 };
+
+exports.addNewPost = (req, res) => {
+  const { userID, lifeGoalID, postData } = req.body;
+  const newDate = new Date();
+  const newPost = {
+    postID: new ObjectId(),
+    postName: postData.postName,
+    postContent: postData.postContent,
+    createdBy: userID,
+    createdAt: newDate,
+    comments: [],
+    postHeaderImage: postData.postHeaderImage
+      ? postData.postHeaderImage
+      : "PLACEHOLDER_HEADER_IMG",
+  };
+
+  User.findOneAndUpdate(
+    { _id: ObjectId(userID) },
+    { $addToSet: { posts: { postID: newPost.postID, createdAt: newDate } } },
+    (err, user) => {
+      if (err) {
+        res.json(err);
+      }
+      // else {res.json(user)}
+    }
+  );
+
+  LifeGoal.findOneAndUpdate(
+    { _id: ObjectId(lifeGoalID) },
+    { $addToSet: { posts: newPost } },
+    (err, lifeGoal) => {
+      if (err) {
+        res.json(err);
+      } else {
+        res.json(lifeGoal);
+      }
+    }
+  );
+};
+
+// TODO - deletepost, commentonpost
+
+exports.commentOnPost = (req, res) => {};
 
 exports.followLifeGoal = (req, res) => {
   const { userID, lifeGoalID } = req.body;

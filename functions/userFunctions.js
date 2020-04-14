@@ -101,6 +101,7 @@ exports.signup = (req, res) => {
         bio: "",
         lifeGoalCategories: [],
       },
+      posts: [],
     });
     bcrypt.hash(password, 10, function (err, hash) {
       newUser.password = hash;

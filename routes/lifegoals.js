@@ -12,11 +12,13 @@ const {
   getLifeGoalComments,
   editComment,
   getSingleComment,
+  addNewPost,
 } = require("../functions/lifegoalFunctions");
 
 // Routes
 router.route("/").get(verifyToken, getLifeGoals);
 router.route("/add").post(verifyToken, addLifeGoal);
+router.route("/post/add").post(verifyToken, addNewPost);
 router.route("/delete").delete(verifyToken, deleteLifeGoal);
 router.route("/follow").post(verifyToken, followLifeGoal);
 router.route("/unfollow").delete(verifyToken, unfollowLifeGoal);

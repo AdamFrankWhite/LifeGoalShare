@@ -44,6 +44,10 @@ const userSchema = new Schema(
       type: Object,
       trim: true,
     },
+    posts: {
+      type: Array,
+      trim: true,
+    },
     lifeGoalsFollowed: {
       type: Array,
       trim: true,

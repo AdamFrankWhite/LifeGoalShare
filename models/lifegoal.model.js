@@ -27,6 +27,10 @@ const lifeGoalSchema = new Schema(
       type: Array,
       required: true,
     },
+    posts: {
+      type: Array,
+      required: true,
+    },
     comments: {
       type: Array,
       trim: true,

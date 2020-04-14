@@ -9,22 +9,40 @@ let db = {
       createdBy: "WeCanHope123",
       createdAt: "2020-03-25T16:25:15.360Z",
       updatedAt: "2020-03-25T16:25:15.360Z",
-      __v: 0
-    }
+      __v: 0,
+    },
+  ],
+
+  posts: [
+    {
+      postID: new ObjectId(),
+      postName: initialPostData.postName,
+      postContent: initialPostData.postContent,
+      createdBy: createdBy,
+      postHeaderImage: "PLACEHOLDER_HEADER_IMG",
+    },
   ],
 
   users: [
     {
-      _id: "5e7b44e385d5201a64e5c929",
-      username: "Barry123",
-      password: "$2b$10$5JIMlfg6sS9H8SCnfXcL4eONtNU0.mGEctSgiB7RKTbEjyI8YutsC",
-      email: "barry123@gmail.com",
-      createdAt: "2020-03-25T11:47:47.999Z",
-      updatedAt: "2020-03-25T11:47:47.999Z",
+      ownLifeGoals: [],
+      lifeGoalsFollowed: [],
+      myComments: [],
+      _id: "5e957edf399b192e705083b1",
+      username: "parsnip",
+      password: "$2b$10$CsqnVd8RvF2lhKQ0plq4l.mSpAnbvw3jp2q.Djj8Hy8EYn5IflEuu",
+      email: "parsnip@thing.com",
+      profile: {
+        handle: "parsnip",
+        profileUrl: "PLACEHOLDER/parsnip",
+        profileImageUrl: "PLACEHOLDER_IMAGE_URL",
+        location: "",
+        bio: "",
+        lifeGoalCategories: [],
+      },
+      createdAt: "2020-04-14T09:14:07.435Z",
+      updatedAt: "2020-04-14T09:14:07.435Z",
       __v: 0,
-      imageUrl: "http://somepic.com/somepic.jpg",
-      profile: "About me",
-      location: "London"
-    }
-  ]
+    },
+  ],
 };
