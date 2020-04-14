@@ -25,11 +25,6 @@ const userSchema = new Schema(
       trim: true,
       minLength: 6,
     },
-    profileImageUrl: {
-      type: String,
-      trim: true,
-      minLength: 6,
-    },
     profile: {
       type: Object,
       unique: true,
@@ -46,7 +41,7 @@ const userSchema = new Schema(
       trim: true,
     },
     messages: {
-      type: Array,
+      type: Object,
       trim: true,
     },
     lifeGoalsFollowed: {

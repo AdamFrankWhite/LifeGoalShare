@@ -8,6 +8,7 @@ const GridFsStorage = require("multer-gridfs-storage");
 const Grid = require("gridfs-stream");
 const methodOverride = require("method-override");
 const path = require("path");
+const ObjectId = mongoose.Types.ObjectId;
 
 // Init gfs
 let gfs;
@@ -20,10 +21,59 @@ connection.once("open", () => {
 // Export Request Handlers
 
 //GET
+exports.getAuthenticatedUser = (req, res) => {
+  User.findOne({ _id: req.body.userID })
+    .then((user) => {
+      res.json(user);
+    })
+    .catch((err) => res.json(err));
+};
+
+exports.getSpecificUsers = (req, res) => {
+  // Expecting array of users
+  const { users } = req.body;
+  // Map to ObjectIds
+  const usersToFind = users.map((user) => ObjectId(user));
+
+  User.find({ _id: { $in: usersToFind } })
+    .then((users) => {
+      res.json(users);
+    })
+    .catch((err) => res.json(err));
+};
+
 exports.getAllUsers = (req, res) => {
   User.find()
     .then((users) => res.json(users))
     .catch((err) => res.status(400).json("Error:" + err));
+};
+
+exports.getProfileImageFile = (req, res) => {
+  gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+    //Check if file
+    if (!file || file.length === 0) {
+      return res.status(404).json({ err: "File does not exist" });
+    }
+
+    return res.json(file);
+  });
+};
+
+exports.showImageFile = (req, res) => {
+  gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+    //Check if file
+    console.log(file);
+    if (!file || file.length === 0) {
+      return res.status(404).json({ err: "File does not exist" });
+    }
+    if (file.contentType === "image/jpeg" || file.contentType === "image/png") {
+      // Read output to browser
+      const readStream = gfs.createReadStream(file.filename);
+      readStream.pipe(res);
+    } else {
+      res.status(404).json({ err: "Not an image" });
+    }
+  });
 };
 
 //POST
@@ -34,6 +84,7 @@ exports.signup = (req, res) => {
     confirmPassword,
     email,
     profileImageUrl,
+    handle,
   } = req.body;
   const imgUrl = profileImageUrl ? profileImageUrl : "PLACEHOLDER_IMAGE_URL";
   const errorMessage = {};
@@ -42,7 +93,14 @@ exports.signup = (req, res) => {
       username,
       password,
       email,
-      profileImageUrl: imgUrl,
+      profile: {
+        handle: handle ? handle : username,
+        profileUrl: `PLACEHOLDER/${username}`,
+        profileImageUrl: imgUrl,
+        location: "",
+        bio: "",
+        lifeGoalCategories: [],
+      },
     });
     bcrypt.hash(password, 10, function (err, hash) {
       newUser.password = hash;
@@ -166,35 +224,6 @@ exports.uploadProfileImage = (req, res) => {
   res.json({ file: req.file });
 };
 
-//GET
-exports.getProfileImageFile = (req, res) => {
-  gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-    //Check if file
-    if (!file || file.length === 0) {
-      return res.status(404).json({ err: "File does not exist" });
-    }
-
-    return res.json(file);
-  });
-};
-
-//GET
-exports.showImageFile = (req, res) => {
-  gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-    //Check if file
-    console.log(file);
-    if (!file || file.length === 0) {
-      return res.status(404).json({ err: "File does not exist" });
-    }
-    if (file.contentType === "image/jpeg" || file.contentType === "image/png") {
-      // Read output to browser
-      const readStream = gfs.createReadStream(file.filename);
-      readStream.pipe(res);
-    } else {
-      res.status(404).json({ err: "Not an image" });
-    }
-  });
-};
 //POST
 exports.setProfileImage = (req, res) => {
   const { userID, profileImageUrl } = req.body;
@@ -216,11 +245,11 @@ exports.setProfileImage = (req, res) => {
 };
 
 exports.updateUserDetails = (req, res) => {
-  const { location, bio, goalCategories, userID } = req.body;
+  const { location, bio, lifeGoalCategories, userID } = req.body;
 
   User.findOneAndUpdate(
     { _id: userID },
-    { $set: { profile: { location, bio, goalCategories } } },
+    { $set: { profile: { location, bio, lifeGoalCategories } } },
     { new: true },
     (err, user) => {
       if (err) {
@@ -231,10 +260,41 @@ exports.updateUserDetails = (req, res) => {
   );
 };
 
-exports.getAuthenticatedUser = (req, res) => {
-  User.findOne({ _id: req.body.userID })
-    .then((user) => {
-      res.json(user);
-    })
-    .catch((err) => res.json(err));
+exports.sendMessage = (req, res) => {
+  const { senderID, receiverID, message, parents } = req.body;
+  const messageToBeSent = {
+    messageID: new ObjectId(),
+    senderID,
+    receiverID,
+    message,
+    parents: !parents ? [] : parents,
+  };
+  User.findOneAndUpdate(
+    { _id: ObjectId(senderID) },
+    { $addToSet: { "messages.sent": messageToBeSent } },
+    (err, user) => {
+      if (err) {
+        res.json(err);
+      }
+      // else {
+      //   res.json(user);
+      // }
+    }
+  );
+
+  User.findOneAndUpdate(
+    { _id: ObjectId(receiverID) },
+    { $addToSet: { "messages.received": messageToBeSent } },
+    (err, user) => {
+      if (err) {
+        res.json(err);
+      } else {
+        res.json(user);
+      }
+    }
+  );
+
+  // Received and sent arrays in User, including parent id, similar to comments
 };
+exports.getMessages = (req, res) => {}; // necessary? getauthenticateduser does the job, however may be good to have separate call for socket.io
+exports.getNotifications = (req, res) => {};

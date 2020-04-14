@@ -309,6 +309,23 @@ exports.getLifeGoalComments = (req, res) => {
     .catch((err) => res.status(400).json(err));
 };
 
+exports.getSingleComment = (req, res) => {
+  const { commentID, lifeGoalID } = req.body;
+  LifeGoal.findOne({
+    _id: ObjectId(lifeGoalID),
+  })
+    .then((user) => {
+      let comments = user.comments;
+      let singleComment = comments.find(
+        (comment) => comment.commentID === commentID
+      );
+      res.json(singleComment);
+    })
+    .catch((err) => res.json(err));
+};
+
+//Likes - on comments, not on lifeGoals? add  userid to array for easy counting and checking if already liked
+
 exports.editComment = (req, res) => {
   const { commentID, updatedComment, lifeGoalID } = req.body;
   LifeGoal.findOneAndUpdate(
@@ -331,7 +348,7 @@ exports.editComment = (req, res) => {
 };
 //TODO - followLifeGoal - add ref to users, add follower to lifeGoal - which router to place in? DONE
 // TODO - addLifeGoal - add ref to users DONE
-//TODO - addComment, deleteComment
+//TODO - addComment, deleteComment DONE
 
 // TODO - deleteLifeGoal - delete ref to users
 //TODO - FRONT END - socket.io to listen for changes to data, e.g. if logged in and another user updates goal or comments/messages you
