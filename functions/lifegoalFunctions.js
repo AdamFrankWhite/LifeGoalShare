@@ -3,6 +3,7 @@ const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
+const verifyUser = require("./verifyUser");
 
 exports.getLifeGoals = (req, res) => {
   LifeGoal.find()
@@ -78,8 +79,11 @@ exports.addLifeGoal = (req, res) => {
 
 exports.deleteLifeGoal = (req, res) => {
   // Grab username from JWT
-  let loggedInUser = "";
+
+  let loggedInUser;
   // Grab lifegoal createdBy value
+
+  //TO REFACTOR FUNCTION: NEED CALLBACK FUNCTION DUE TO ASYNC ISSUE
 
   jwt.verify(req.headers.authorization, "secret_key", (err, authData) => {
     if (err) {
@@ -105,17 +109,17 @@ exports.deleteLifeGoal = (req, res) => {
     }
   );
   let lifeGoalCreator = "";
+
   // Find lifegoal
   LifeGoal.findOne({ _id: lifeGoalID })
     // TODO: Error handle not found
     .then((lifegoal) => {
       lifeGoalCreator = lifegoal.createdBy;
-      console.log("boo");
     })
     .then((data) => {
       //Check if lifegoal was created by user. If so, delete
+
       if (loggedInUser == lifeGoalCreator) {
-        console.log("boo2");
         LifeGoal.findOneAndDelete({ _id: lifeGoalID })
           .exec()
           .then((lifegoal) =>
@@ -183,6 +187,8 @@ exports.deletePost = (req, res) => {
       // TODO --- if lifegoal deleted, leave history of it?
     }
   });
+
+  //TODO - do similar verification as for delete lifegoal
 
   User.findOneAndUpdate(
     { _id: ObjectId(userID) },
