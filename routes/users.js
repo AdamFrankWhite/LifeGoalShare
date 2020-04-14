@@ -12,6 +12,7 @@ const {
   getAuthenticatedUser,
   getSpecificUsers,
   sendMessage,
+  deleteMessage,
 } = require("../functions/userFunctions");
 
 const verifyToken = require("../functions/verifyToken");
@@ -36,6 +37,7 @@ router
   .route("/profile")
   .post(verifyToken, ProfileImageUpload, uploadProfileImage);
 router.route("/message/send").post(verifyToken, sendMessage);
+router.route("/message/delete").delete(verifyToken, deleteMessage);
 
 module.exports = router;
 

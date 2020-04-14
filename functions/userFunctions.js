@@ -269,6 +269,8 @@ exports.sendMessage = (req, res) => {
     message,
     parents: !parents ? [] : parents,
   };
+
+  // Sent Message
   User.findOneAndUpdate(
     { _id: ObjectId(senderID) },
     { $addToSet: { "messages.sent": messageToBeSent } },
@@ -282,6 +284,7 @@ exports.sendMessage = (req, res) => {
     }
   );
 
+  //Received Message
   User.findOneAndUpdate(
     { _id: ObjectId(receiverID) },
     { $addToSet: { "messages.received": messageToBeSent } },
@@ -293,8 +296,27 @@ exports.sendMessage = (req, res) => {
       }
     }
   );
+};
 
-  // Received and sent arrays in User, including parent id, similar to comments
+exports.deleteMessage = (req, res) => {
+  const { userID, messageID, messageType } = req.body;
+  // Only deletes message for user taking action
+  User.findOneAndUpdate(
+    { _id: userID },
+    {
+      $pull: {
+        [`messages.${messageType}`]: { messageID: ObjectId(messageID) },
+      },
+    },
+    { safe: true },
+    (err, user) => {
+      if (err) {
+        res.json(err);
+      } else {
+        res.json("Message deleted");
+      }
+    }
+  );
 };
 exports.getMessages = (req, res) => {}; // necessary? getauthenticateduser does the job, however may be good to have separate call for socket.io
 exports.getNotifications = (req, res) => {};

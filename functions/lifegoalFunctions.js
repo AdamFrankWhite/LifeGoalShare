@@ -224,7 +224,7 @@ exports.deleteComment = (req, res) => {
   const { userID, commentID, lifeGoalID } = req.body;
   User.findOneAndUpdate(
     { _id: new ObjectId(userID) },
-    { $pull: { myComments: { commentIdRef: commentID } } },
+    { $pull: { myComments: { commentID: commentID } } },
     { safe: true },
     (err, user) => {
       if (err) {
