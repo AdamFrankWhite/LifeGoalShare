@@ -1,4 +1,5 @@
 const User = require("../models/user.model");
+const LifeGoal = require("../models/lifegoal.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
@@ -279,10 +280,9 @@ exports.sendMessage = (req, res) => {
     (err, user) => {
       if (err) {
         res.json(err);
+      } else {
+        res.json(user);
       }
-      // else {
-      //   res.json(user);
-      // }
     }
   );
 
@@ -321,7 +321,31 @@ exports.deleteMessage = (req, res) => {
   );
 };
 
-exports.getUserComments = (req, res) => {};
+exports.getUserComments = (req, res) => {
+  console.log(typeof req.currentUser);
+  const { userID } = req.body;
+  LifeGoal.find({ comments: { $elemMatch: { author: userID } } })
+    .then((posts) => {
+      let myComments = [];
+      posts.forEach((post) => {
+        post.comments.forEach((comment) =>
+          myComments.push({ post: post._id, comment: comment })
+        );
+      });
+      res.json(myComments);
+    })
+    .catch((err) => res.json(err));
+  //   LifeGoal.aggregate([
+  //     { $match: { comments: { $elemMatch: { author: req.currentUser } } } },
+  //   ])
+  //     .then((comments) => {
+  //       res.json(comments);
+  //     })
+  //     .catch((err) => res.json(err));
+};
+// see if you can return only certain fields, i.e. id, comments
+
+// NEXT - add comment to post
 
 // TODO - you don't need most/all of the multi-part callbacks, you can trim excess user data, just query it from lifegoals - DONE
 // TODO - messages need own collection

@@ -14,6 +14,7 @@ const {
   sendMessage,
   deleteMessage,
   getMessages,
+  getUserComments,
 } = require("../functions/userFunctions");
 
 const verifyToken = require("../functions/verifyToken");
@@ -28,6 +29,7 @@ router.route("/profile/get").get(verifyToken, getAuthenticatedUser);
 router.route("/getusers").get(verifyToken, getSpecificUsers);
 router.route("/profile/files/:filename").get(verifyToken, getProfileImageFile);
 router.route("/profile/image/:filename").get(verifyToken, showImageFile);
+router.route("/comments").get(verifyToken, getUserComments);
 // router.route("/messages").get(verifyToken, getMessages);
 
 //PUT
