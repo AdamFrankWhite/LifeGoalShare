@@ -22,7 +22,7 @@ connection.once("open", () => {
 
 //GET
 exports.getAuthenticatedUser = (req, res) => {
-  User.findOne({ _id: req.body.userID })
+  User.findOne({ _id: req.currentUser })
     .then((user) => {
       res.json(user);
     })
@@ -229,12 +229,12 @@ exports.uploadProfileImage = (req, res) => {
 exports.setProfileImage = (req, res) => {
   const { userID, profileImageUrl } = req.body;
 
-  if (userID !== "userCredentials.id") {
-    return res.status(403).json("Forbidden");
-  }
+  // if (req.currentUser !== "userCredentials.id") {
+  //   return res.status(403).json("Forbidden");
+  // }
   User.findOneAndUpdate(
     { _id: userID },
-    { $set: { profileImageUrl: profileImageUrl } },
+    { $set: { "profile.profileImageUrl": profileImageUrl } },
     { new: true },
     (err, user) => {
       if (err) {
@@ -246,10 +246,10 @@ exports.setProfileImage = (req, res) => {
 };
 
 exports.updateUserDetails = (req, res) => {
-  const { location, bio, lifeGoalCategories, userID } = req.body;
+  const { location, bio, lifeGoalCategories } = req.body;
 
   User.findOneAndUpdate(
-    { _id: userID },
+    { _id: req.currentUser },
     { $set: { profile: { location, bio, lifeGoalCategories } } },
     { new: true },
     (err, user) => {
@@ -320,14 +320,9 @@ exports.deleteMessage = (req, res) => {
     }
   );
 };
-exports.getMessages = (req, res) => {
-  const { userID } = req.body;
 
-  User.findOne({ _id: ObjectId(userID) })
-    .then((user) => res.json(user.messages))
-    .catch((err) => res.json(err));
-}; // necessary? getauthenticateduser does the job, however may be good to have separate call for socket.io
-exports.getNotifications = (req, res) => {};
+exports.getUserComments = (req, res) => {};
 
-//TODO - TRANSACTIONS - solve data consistency issue for add/delete message and other multi-part callbacks: https://www.mongodb.com/blog/post/quick-start-nodejs--mongodb--how-to-implement-transactions
-// TODO - you don't need most/all of the multi-part callbacks, you can trim excess user data, just query it from lifegoals
+// TODO - you don't need most/all of the multi-part callbacks, you can trim excess user data, just query it from lifegoals - DONE
+// TODO - messages need own collection
+// TODO - query comments / posts
