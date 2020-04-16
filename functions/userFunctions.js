@@ -269,6 +269,7 @@ exports.sendMessage = (req, res) => {
     receiverID,
     message,
     parents: !parents ? [] : parents,
+    createdAt: new Date(),
   };
 
   // Sent Message
@@ -319,5 +320,13 @@ exports.deleteMessage = (req, res) => {
     }
   );
 };
-exports.getMessages = (req, res) => {}; // necessary? getauthenticateduser does the job, however may be good to have separate call for socket.io
+exports.getMessages = (req, res) => {
+  const { userID } = req.body;
+
+  User.findOne({ _id: ObjectId(userID) })
+    .then((user) => res.json(user.messages))
+    .catch((err) => res.json(err));
+}; // necessary? getauthenticateduser does the job, however may be good to have separate call for socket.io
 exports.getNotifications = (req, res) => {};
+
+//TODO - TRANSACTIONS - add/delete message and other multi-part callbacks: https://www.mongodb.com/blog/post/quick-start-nodejs--mongodb--how-to-implement-transactions

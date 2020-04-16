@@ -13,6 +13,7 @@ const {
   getSpecificUsers,
   sendMessage,
   deleteMessage,
+  getMessages,
 } = require("../functions/userFunctions");
 
 const verifyToken = require("../functions/verifyToken");
@@ -27,6 +28,7 @@ router.route("/profile/get").get(verifyToken, getAuthenticatedUser);
 router.route("/getusers").get(verifyToken, getSpecificUsers);
 router.route("/profile/files/:filename").get(verifyToken, getProfileImageFile);
 router.route("/profile/image/:filename").get(verifyToken, showImageFile);
+router.route("/messages").get(verifyToken, getMessages);
 
 //POST
 router.route("/signup").post(signup);
