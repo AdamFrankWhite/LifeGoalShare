@@ -31,29 +31,8 @@ const userSchema = new Schema(
       trim: true,
       minLength: 6,
     },
-    location: {
-      type: String,
-      trim: true,
-      minLength: 6,
-    },
-    ownLifeGoals: {
-      type: Array,
-      trim: true,
-    },
     messages: {
       type: Object,
-      trim: true,
-    },
-    posts: {
-      type: Array,
-      trim: true,
-    },
-    lifeGoalsFollowed: {
-      type: Array,
-      trim: true,
-    },
-    myComments: {
-      type: Array,
       trim: true,
     },
   },
