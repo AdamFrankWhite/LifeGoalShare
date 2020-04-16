@@ -329,4 +329,5 @@ exports.getMessages = (req, res) => {
 }; // necessary? getauthenticateduser does the job, however may be good to have separate call for socket.io
 exports.getNotifications = (req, res) => {};
 
-//TODO - TRANSACTIONS - add/delete message and other multi-part callbacks: https://www.mongodb.com/blog/post/quick-start-nodejs--mongodb--how-to-implement-transactions
+//TODO - TRANSACTIONS - solve data consistency issue for add/delete message and other multi-part callbacks: https://www.mongodb.com/blog/post/quick-start-nodejs--mongodb--how-to-implement-transactions
+// TODO - you don't need most/all of the multi-part callbacks, you can trim excess user data, just query it from lifegoals

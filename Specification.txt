@@ -24,3 +24,7 @@ TODO
 search goals/posts
 user restriction - verifyToken auth function sends along user in req, which can then be used to verify db match. i.e. logged in user can only modify their own posts/goals
 user session
+
+Data Consistency - need transactions to ensure data remans consistent when making multiple-query calls
+
+16/4/20 Breakthroughs - 1) simplify schema, no need to duplicate data with refs, simply query collection separately. 2) pass along new header in middleware for easy verification
