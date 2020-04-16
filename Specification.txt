@@ -22,5 +22,5 @@ created backend functions
 
 TODO
 search goals/posts
-user restriction
+user restriction - verifyToken auth function sends along user in req, which can then be used to verify db match. i.e. logged in user can only modify their own posts/goals
 user session

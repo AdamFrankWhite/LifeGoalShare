@@ -13,6 +13,8 @@ function verifyToken(req, res, next) {
       if (err) {
         res.sendStatus(403);
       } else {
+        // Place logged in user id in req object, to be passed along to callback function
+        req.currentUser = authData.user._id.toString();
         // console.log({ message: "you have done something lifegoal", authData });
         next();
       }

@@ -6,6 +6,7 @@ const ObjectId = mongoose.Types.ObjectId;
 const verifyUser = require("./verifyUser");
 
 exports.getLifeGoals = (req, res) => {
+  console.log(req.currentUser);
   LifeGoal.find()
     .then((data) => res.json(data))
     .catch((error) => res.status(400).json("Error: " + error));
@@ -80,19 +81,7 @@ exports.addLifeGoal = (req, res) => {
 exports.deleteLifeGoal = (req, res) => {
   // Grab username from JWT
 
-  let loggedInUser;
-  // Grab lifegoal createdBy value
-
-  //TO REFACTOR FUNCTION: NEED CALLBACK FUNCTION DUE TO ASYNC ISSUE
-
-  jwt.verify(req.headers.authorization, "secret_key", (err, authData) => {
-    if (err) {
-      res.sendStatus(403);
-    } else {
-      loggedInUser = authData.user._id;
-      // TODO --- if lifegoal deleted, leave history of it?
-    }
-  });
+  let loggedInUser = req.currentUser;
   const { userID, lifeGoalID } = req.body;
   User.findOneAndUpdate(
     { _id: new ObjectId(userID) },
@@ -465,9 +454,8 @@ exports.editComment = (req, res) => {
     }
   );
 };
-//TODO - followLifeGoal - add ref to users, add follower to lifeGoal - which router to place in? DONE
-// TODO - addLifeGoal - add ref to users DONE
-//TODO - addComment, deleteComment DONE
 
-// TODO - deleteLifeGoal - delete ref to users
+// TODO - deleteLifeGoal - delete ref to posts - need TRANSACTION FOR MULTIPLE UPDATES
+// TODO - add req.currentUser verification to all functions and refactor
+
 //TODO - FRONT END - socket.io to listen for changes to data, e.g. if logged in and another user updates goal or comments/messages you
