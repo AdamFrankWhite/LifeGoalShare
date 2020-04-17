@@ -17,7 +17,8 @@ const {
 } = require("../functions/lifegoalFunctions");
 
 // Routes
-router.route("/").get(verifyToken, getLifeGoals);
+router.route("/").get(getLifeGoals);
+// Add getFollowedLifeGoals
 router.route("/add").post(verifyToken, addLifeGoal);
 router.route("/post/add").post(verifyToken, addNewPost);
 router.route("/post/delete").delete(verifyToken, deletePost);
