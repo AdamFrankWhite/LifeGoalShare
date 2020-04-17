@@ -30,6 +30,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+app.use(cors());
 
 // Routers
 const usersRouter = require("./routes/users.js");
