@@ -1,6 +1,6 @@
 const User = require("../models/user.model");
 const LifeGoal = require("../models/lifegoal.model");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const crypto = require("crypto");
