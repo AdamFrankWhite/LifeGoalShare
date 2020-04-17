@@ -18,10 +18,9 @@ const lifeGoalSchema = new Schema(
       minLength: 6,
     },
     createdBy: {
-      type: String,
+      type: Object,
       required: true,
       trim: true,
-      minLength: 6,
     },
     followers: {
       type: Array,

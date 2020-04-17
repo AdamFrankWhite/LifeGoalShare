@@ -14,7 +14,7 @@ exports.addLifeGoal = (req, res) => {
   const {
     lifeGoalName,
     lifeGoalDescription,
-    userID,
+    userProfileSnapshot,
     followers,
     initialPostData,
   } = req.body;
@@ -23,7 +23,7 @@ exports.addLifeGoal = (req, res) => {
     postID: new ObjectId(),
     postName: initialPostData.postName,
     postContent: initialPostData.postContent,
-    createdBy: userID,
+    createdBy: userProfileSnapshot,
     createdAt: new Date(),
     comments: [],
     postHeaderImage: initialPostData.postHeaderImage
@@ -34,7 +34,7 @@ exports.addLifeGoal = (req, res) => {
   const lifeGoal = new LifeGoal({
     lifeGoalName,
     lifeGoalDescription,
-    createdBy: userID,
+    createdBy: userProfileSnapshot,
     followers,
     posts: [initialPost],
   });
