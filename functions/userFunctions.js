@@ -25,7 +25,13 @@ connection.once("open", () => {
 exports.getAuthenticatedUser = (req, res) => {
   User.findOne({ _id: req.currentUser })
     .then((user) => {
-      res.json(user);
+      let resData = {
+        _id: user._id,
+        profile: user.profile,
+        username: user.username,
+        createdAt: user.createdAt,
+      };
+      res.json(resData);
     })
     .catch((err) => res.json(err));
 };
@@ -323,8 +329,7 @@ exports.deleteMessage = (req, res) => {
 
 exports.getUserComments = (req, res) => {
   console.log(typeof req.currentUser);
-  const { userID } = req.body;
-  LifeGoal.find({ comments: { $elemMatch: { author: userID } } })
+  LifeGoal.find({ comments: { $elemMatch: { author: req.currentUser } } })
     .then((posts) => {
       let myComments = [];
       posts.forEach((post) => {
