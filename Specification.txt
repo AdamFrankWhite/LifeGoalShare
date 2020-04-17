@@ -28,3 +28,4 @@ user session
 Data Consistency - need transactions to ensure data remans consistent when making multiple-query calls
 
 16/4/20 Breakthroughs - 1) simplify schema, no need to duplicate data with refs, simply query collection separately. 2) pass along new header in middleware for easy verification
+17/4/20 When uploading server to heroku, remove node_modules and also make sure to use bcryptjs, not bcrypt, as it has node compatibility issues
