@@ -170,15 +170,15 @@ exports.unfollowLifeGoal = (req, res) => {
 //Add comment
 
 exports.postNewComment = (req, res) => {
-  const { lifeGoalID, comment, parentComments } = req.body;
+  const { lifeGoalID, comment, parentComment } = req.body;
   const commentID = new ObjectId().toString();
   const newDate = new Date();
 
   let userComment = {
     commentID: commentID,
-    author: req.currentUser,
+    author: req.currentUserData.profile.handle,
     comment: comment,
-    parents: !parentComments ? [] : parentComments,
+    parent: !parentComment ? "" : parentComment,
     createdAt: newDate,
   };
 
