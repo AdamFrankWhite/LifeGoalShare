@@ -200,20 +200,37 @@ exports.deleteComment = (req, res) => {
   //Update UserData
 
   const { commentID, lifeGoalID } = req.body;
-
-  // Update lifegoal
   LifeGoal.findOneAndUpdate(
-    { _id: new ObjectId(lifeGoalID) }, // To be clear ======> When querying main collection with id, it expects to be an object, as that is what your Schema is set to create. However, if you created ids, then string is to be expected. Pay attention to the method of id creation!
-    { $pull: { comments: { commentID: commentID } } },
-    { safe: true },
+    { _id: new ObjectId(lifeGoalID), "comments.commentID": commentID },
+    {
+      $set: {
+        "comments.$.comment": "DELETED",
+        "comments.$.createdAt": new Date(),
+      },
+    },
+    { new: true },
     (err, lifeGoal) => {
       if (err) {
         res.json(err);
       } else {
-        res.json("Comment deleted!");
+        res.json("Comment updated");
       }
     }
   );
+
+  // // Update lifegoal
+  // LifeGoal.findOneAndUpdate(
+  //   { _id: new ObjectId(lifeGoalID) }, // To be clear ======> When querying main collection with id, it expects to be an object, as that is what your Schema is set to create. However, if you created ids, then string is to be expected. Pay attention to the method of id creation!
+  //   { $pull: { comments: { commentID: commentID } } },
+  //   { safe: true },
+  //   (err, lifeGoal) => {
+  //     if (err) {
+  //       res.json(err);
+  //     } else {
+  //       res.json("Comment deleted!");
+  //     }
+  //   }
+  // );
 };
 
 // exports.postCommentReply = (req, res) => {
