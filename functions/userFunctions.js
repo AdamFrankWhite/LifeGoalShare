@@ -185,15 +185,20 @@ exports.login = (req, res) => {
     } else {
       console.log("Logged In");
       // If authorised, create token
-      jwt.sign({ user }, "secret_key", { expiresIn: "180m" }, (err, token) => {
-        if (token) {
-          // add res.header = token   ??
-          res.json({ token });
-          //TODO: put token in local storage
-        } else {
-          res.json("Error: " + err);
+      jwt.sign(
+        { user },
+        "secret_key",
+        // { expiresIn: "5m" },
+        (err, token) => {
+          if (token) {
+            // add res.header = token   ??
+            res.json({ token });
+            //TODO: put token in local storage
+          } else {
+            res.json("Error: " + err);
+          }
         }
-      });
+      );
     }
   });
 };
@@ -257,7 +262,7 @@ exports.updateUserDetails = (req, res) => {
 
   User.findOneAndUpdate(
     { _id: req.currentUser },
-    { $set: { profile: { location, bio, lifeGoalCategories } } },
+    { $set: { "profile.location": location, "profile.bio": bio } },
     { new: true },
     (err, user) => {
       if (err) {
