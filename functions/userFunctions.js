@@ -76,6 +76,8 @@ exports.showImageFile = (req, res) => {
     if (file.contentType === "image/jpeg" || file.contentType === "image/png") {
       // Read output to browser
       const readStream = gfs.createReadStream(file.filename);
+
+      res.writeHead(200, { "Content-Type": "image/png" });
       readStream.pipe(res);
     } else {
       res.status(404).json({ err: "Not an image" });
@@ -239,13 +241,11 @@ exports.uploadProfileImage = (req, res) => {
 
 //POST
 exports.setProfileImage = (req, res) => {
-  const { userID, profileImageUrl } = req.body;
+  const { profileImageUrl } = req.body;
+  console.log(profileImageUrl);
 
-  // if (req.currentUser !== "userCredentials.id") {
-  //   return res.status(403).json("Forbidden");
-  // }
   User.findOneAndUpdate(
-    { _id: userID },
+    { _id: ObjectId(req.currentUser) },
     { $set: { "profile.profileImageUrl": profileImageUrl } },
     { new: true },
     (err, user) => {
