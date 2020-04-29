@@ -280,7 +280,6 @@ exports.uploadProfileImage = (req, res) => {
 //POST
 exports.setProfileImage = (req, res) => {
   const { profileImageUrl } = req.body;
-  console.log(profileImageUrl);
 
   User.findOneAndUpdate(
     { _id: ObjectId(req.currentUser) },
