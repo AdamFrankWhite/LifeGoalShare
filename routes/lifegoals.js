@@ -14,10 +14,12 @@ const {
   getSingleComment,
   addNewPost,
   deletePost,
+  getUserLifeGoals,
 } = require("../functions/lifegoalFunctions");
 
 // Routes
 router.route("/").get(getLifeGoals);
+router.route("/:id").get(verifyToken, getUserLifeGoals);
 // Add getFollowedLifeGoals
 router.route("/add").post(verifyToken, addLifeGoal);
 router.route("/post/add").post(verifyToken, addNewPost);

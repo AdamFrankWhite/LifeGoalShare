@@ -268,7 +268,7 @@ exports.fileUpload = (req, res) => {
       if (err) {
         throw err;
       }
-      res.json(clientFileUrl);
+      res.json({ user, clientFileUrl });
     }
   );
 };

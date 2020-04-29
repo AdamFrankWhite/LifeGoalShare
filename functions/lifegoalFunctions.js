@@ -10,6 +10,17 @@ exports.getLifeGoals = (req, res) => {
     .catch((error) => res.status(400).json("Error: " + error));
 };
 
+exports.getUserLifeGoals = (req, res) => {
+  const handle = req.params.id;
+  LifeGoal.find({ "createdBy.handle": handle })
+    .then((lifegoals) => {
+      return res.json(lifegoals);
+    })
+    .catch((err) => {
+      return res.json(err);
+    });
+};
+
 exports.addLifeGoal = (req, res) => {
   const {
     lifeGoalName,
