@@ -9,6 +9,8 @@ const GridFsStorage = require("multer-gridfs-storage");
 const Grid = require("gridfs-stream");
 const methodOverride = require("method-override");
 const path = require("path");
+const fs = require("fs");
+const fsExtra = require("fs-extra");
 const ObjectId = mongoose.Types.ObjectId;
 
 // Init gfs
@@ -235,6 +237,42 @@ exports.createProfileImageUpload = (req, res) => {
 };
 
 //POST
+
+exports.fileUpload = (req, res) => {
+  if (req.files === null) {
+    return res.status(400).json("No file uploaded");
+  }
+
+  const file = req.files.file;
+  const fileDestinationUrl = `../../lifegoalshare-client/public/uploads/profilePics/${req.currentUser}`;
+  const clientFileUrl = `/uploads/profilePics/${req.currentUser}/${file.name}`;
+  console.log(fileDestinationUrl);
+  let clientPath = path.join(__dirname, fileDestinationUrl);
+  // Checks if user image folder exists, if not creates one
+  if (!fs.existsSync(clientPath)) {
+    fs.mkdirSync(clientPath);
+  }
+  //Empties folder to ensure only one image per user
+  fsExtra.emptyDirSync(clientPath);
+  //Move new image to folder
+  file.mv(`${clientPath}/${file.name}`, (err) => {
+    if (err) {
+      res.json(err);
+    }
+  });
+  User.findOneAndUpdate(
+    { _id: ObjectId(req.currentUser) },
+    { $set: { "profile.profileImageUrl": clientFileUrl } },
+    { new: true },
+    (err, user) => {
+      if (err) {
+        throw err;
+      }
+      res.json(clientFileUrl);
+    }
+  );
+};
+
 exports.uploadProfileImage = (req, res) => {
   res.json({ file: req.file });
 };

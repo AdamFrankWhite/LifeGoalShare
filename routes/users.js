@@ -15,6 +15,7 @@ const {
   deleteMessage,
   getMessages,
   getUserComments,
+  fileUpload,
 } = require("../functions/userFunctions");
 
 const verifyToken = require("../functions/verifyToken");
@@ -37,6 +38,8 @@ router.route("/comments").get(verifyToken, getUserComments);
 router.route("/profile/update").put(verifyToken, updateUserDetails);
 
 //POST
+router.route("/profile/upload").post(verifyToken, fileUpload);
+
 router.route("/signup").post(signup);
 router.route("/login").post(login);
 router.route("/profile/update/img").post(verifyToken, setProfileImage);

@@ -4,7 +4,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyparser = require("body-parser");
-const verifyToken = require("./functions/verifyToken");
+const fileUpload = require("express-fileupload");
 
 // Config
 
@@ -31,6 +31,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use(fileUpload());
 
 // Routers
 const usersRouter = require("./routes/users.js");
