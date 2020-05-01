@@ -20,7 +20,7 @@ const {
 
 const verifyToken = require("../functions/verifyToken");
 const multer = require("multer");
-const ProfileImageUpload = createProfileImageUpload().single("file");
+// const ProfileImageUpload = createProfileImageUpload().single("file");
 
 // Routes
 
@@ -43,9 +43,9 @@ router.route("/profile/upload").post(verifyToken, fileUpload);
 router.route("/signup").post(signup);
 router.route("/login").post(login);
 router.route("/profile/update/img").post(verifyToken, setProfileImage);
-router
-  .route("/profile")
-  .post(verifyToken, ProfileImageUpload, uploadProfileImage);
+// router
+//   .route("/profile")
+//   .post(verifyToken, ProfileImageUpload, uploadProfileImage);
 // router.route("/message/send").post(verifyToken, sendMessage);
 router.route("/message/delete").delete(verifyToken, deleteMessage);
 

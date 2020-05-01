@@ -25,28 +25,28 @@ exports.addLifeGoal = (req, res) => {
   const {
     lifeGoalName,
     lifeGoalDescription,
-    userProfileSnapshot,
-    followers,
-    initialPostData,
+    initialPostName,
+    initialPostContent,
+    initialPostHeaderImage,
   } = req.body;
 
   const initialPost = {
     postID: new ObjectId(),
-    postName: initialPostData.postName,
-    postContent: initialPostData.postContent,
-    createdBy: userProfileSnapshot,
+    postName: initialPostName,
+    postContent: initialPostContent,
+    createdBy: req.currentUser,
     createdAt: new Date(),
     comments: [],
-    postHeaderImage: initialPostData.postHeaderImage
-      ? initialPostData.postHeaderImage
+    postHeaderImage: initialPostHeaderImage
+      ? initialPostHeaderImage
       : "PLACEHOLDER_HEADER_IMG",
   };
 
   const lifeGoal = new LifeGoal({
     lifeGoalName,
     lifeGoalDescription,
-    createdBy: userProfileSnapshot,
-    followers,
+    createdBy: req.currentUser,
+    followers: [],
     posts: [initialPost],
   });
   lifeGoal

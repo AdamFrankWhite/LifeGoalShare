@@ -7,7 +7,6 @@ const crypto = require("crypto");
 const multer = require("multer");
 const GridFsStorage = require("multer-gridfs-storage");
 const Grid = require("gridfs-stream");
-const methodOverride = require("method-override");
 const path = require("path");
 const fs = require("fs");
 const fsExtra = require("fs-extra");
@@ -57,35 +56,35 @@ exports.getAllUsers = (req, res) => {
     .catch((err) => res.status(400).json("Error:" + err));
 };
 
-exports.getProfileImageFile = (req, res) => {
-  gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-    //Check if file
-    if (!file || file.length === 0) {
-      return res.status(404).json({ err: "File does not exist" });
-    }
+// exports.getProfileImageFile = (req, res) => {
+//   gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+//     //Check if file
+//     if (!file || file.length === 0) {
+//       return res.status(404).json({ err: "File does not exist" });
+//     }
 
-    return res.json(file);
-  });
-};
+//     return res.json(file);
+//   });
+// };
 
-exports.showImageFile = (req, res) => {
-  gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-    //Check if file
-    console.log(file);
-    if (!file || file.length === 0) {
-      return res.status(404).json({ err: "File does not exist" });
-    }
-    if (file.contentType === "image/jpeg" || file.contentType === "image/png") {
-      // Read output to browser
-      const readStream = gfs.createReadStream(file.filename);
+// exports.showImageFile = (req, res) => {
+//   gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+//     //Check if file
+//     console.log(file);
+//     if (!file || file.length === 0) {
+//       return res.status(404).json({ err: "File does not exist" });
+//     }
+//     if (file.contentType === "image/jpeg" || file.contentType === "image/png") {
+//       // Read output to browser
+//       const readStream = gfs.createReadStream(file.filename);
 
-      res.writeHead(200, { "Content-Type": "image/png" });
-      readStream.pipe(res);
-    } else {
-      res.status(404).json({ err: "Not an image" });
-    }
-  });
-};
+//       res.writeHead(200, { "Content-Type": "image/png" });
+//       readStream.pipe(res);
+//     } else {
+//       res.status(404).json({ err: "Not an image" });
+//     }
+//   });
+// };
 
 //POST
 exports.signup = (req, res) => {
@@ -208,33 +207,33 @@ exports.login = (req, res) => {
 };
 
 //POST
-exports.createProfileImageUpload = (req, res) => {
-  //Create storage engine
-  const storage = new GridFsStorage({
-    url: process.env.ATLAS_URI,
-    file: (req, file) => {
-      console.log(file.mimetype);
-      if (file.mimetype !== "image/png" && file.mimetype !== "image/jpeg") {
-        throw "Error: File must be jpg or png";
-      }
-      return new Promise((resolve, reject) => {
-        crypto.randomBytes(16, (err, buf) => {
-          if (err) {
-            return reject(err);
-          }
-          const filename =
-            buf.toString("hex") + path.extname(file.originalname);
-          const fileInfo = {
-            filename: filename,
-            bucketName: "uploads",
-          };
-          resolve(fileInfo);
-        });
-      });
-    },
-  });
-  return multer({ storage });
-};
+// exports.createProfileImageUpload = (req, res) => {
+//   //Create storage engine
+//   const storage = new GridFsStorage({
+//     url: process.env.ATLAS_URI,
+//     file: (req, file) => {
+//       console.log(file.mimetype);
+//       if (file.mimetype !== "image/png" && file.mimetype !== "image/jpeg") {
+//         throw "Error: File must be jpg or png";
+//       }
+//       return new Promise((resolve, reject) => {
+//         crypto.randomBytes(16, (err, buf) => {
+//           if (err) {
+//             return reject(err);
+//           }
+//           const filename =
+//             buf.toString("hex") + path.extname(file.originalname);
+//           const fileInfo = {
+//             filename: filename,
+//             bucketName: "uploads",
+//           };
+//           resolve(fileInfo);
+//         });
+//       });
+//     },
+//   });
+//   return multer({ storage });
+// };
 
 //POST
 
@@ -246,7 +245,6 @@ exports.fileUpload = (req, res) => {
   const file = req.files.file;
   const fileDestinationUrl = `../../lifegoalshare-client/public/uploads/profilePics/${req.currentUser}`;
   const clientFileUrl = `/uploads/profilePics/${req.currentUser}/${file.name}`;
-  console.log(fileDestinationUrl);
   let clientPath = path.join(__dirname, fileDestinationUrl);
   // Checks if user image folder exists, if not creates one
   if (!fs.existsSync(clientPath)) {
@@ -273,9 +271,9 @@ exports.fileUpload = (req, res) => {
   );
 };
 
-exports.uploadProfileImage = (req, res) => {
-  res.json({ file: req.file });
-};
+// exports.uploadProfileImage = (req, res) => {
+//   res.json({ file: req.file });
+// };
 
 //POST
 exports.setProfileImage = (req, res) => {
