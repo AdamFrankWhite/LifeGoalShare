@@ -241,7 +241,7 @@ exports.fileUpload = (req, res) => {
   if (req.files === null) {
     return res.status(400).json("No file uploaded");
   }
-
+  // NEED TO VALIDATE IMAGE
   const file = req.files.file;
   const fileDestinationUrl = `../../lifegoalshare-client/public/uploads/profilePics/${req.currentUser}`;
   const clientFileUrl = `/uploads/profilePics/${req.currentUser}/${file.name}`;

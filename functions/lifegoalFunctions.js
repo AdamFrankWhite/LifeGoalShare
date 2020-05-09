@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
+// Note: Access userData via req.currentUserData (see verifyToken)
+
 exports.getLifeGoals = (req, res) => {
   LifeGoal.find()
     .then((data) => res.json(data))
@@ -45,7 +47,7 @@ exports.addLifeGoal = (req, res) => {
   const lifeGoal = new LifeGoal({
     lifeGoalName,
     lifeGoalDescription,
-    createdBy: req.currentUser,
+    createdBy: req.currentUserData.profile,
     followers: [],
     posts: [initialPost],
   });
@@ -95,9 +97,7 @@ exports.addNewPost = (req, res) => {
     createdBy: req.currentUser,
     createdAt: newDate,
     comments: [],
-    postHeaderImage: postData.postHeaderImage
-      ? postData.postHeaderImage
-      : "PLACEHOLDER_HEADER_IMG",
+    postHeaderImage: postData.postHeaderImage ? postData.postHeaderImage : "",
   };
 
   LifeGoal.findOneAndUpdate(
@@ -136,7 +136,32 @@ exports.deletePost = (req, res) => {
   );
 };
 
-exports.commentOnPost = (req, res) => {};
+exports.commentOnPost = (req, res) => {
+  const { lifeGoalID, postID, comment, parentComments } = req.body;
+  const commentID = new ObjectId().toString();
+  const newDate = new Date();
+
+  let userComment = {
+    commentID: commentID,
+    author: req.currentUserData.profile.handle,
+    comment: comment,
+    parents: !parentComments ? [] : parentComments,
+    createdAt: newDate,
+  };
+
+  LifeGoal.findOneAndUpdate(
+    { _id: new ObjectId(lifeGoalID), "posts.postID": new ObjectId(postID) },
+    { $addToSet: { "posts.$.comments": userComment } },
+    { new: true },
+    (err, lifeGoal) => {
+      if (err) {
+        res.json(err);
+      } else {
+        res.json(lifeGoal);
+      }
+    }
+  );
+};
 
 exports.followLifeGoal = (req, res) => {
   const { lifeGoalID } = req.body;

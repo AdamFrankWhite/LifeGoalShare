@@ -16,7 +16,6 @@ function verifyToken(req, res, next) {
         // Place logged in user id in req object, to be passed along to callback function
         req.currentUser = authData.user._id.toString();
         req.currentUserData = authData.user;
-        // console.log({ message: "you have done something lifegoal", authData });
         next();
       }
     });

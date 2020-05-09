@@ -15,6 +15,7 @@ const {
   addNewPost,
   deletePost,
   getUserLifeGoals,
+  commentOnPost,
 } = require("../functions/lifegoalFunctions");
 
 // Routes
@@ -32,4 +33,5 @@ router.route("/comment/post").post(verifyToken, postNewComment);
 router.route("/comment/delete").put(verifyToken, deleteComment);
 router.route("/comments").get(verifyToken, getLifeGoalComments);
 router.route("/comment/edit").put(verifyToken, editComment);
+router.route("/post/comment").post(verifyToken, commentOnPost);
 module.exports = router;
