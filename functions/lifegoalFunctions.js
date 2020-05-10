@@ -52,8 +52,9 @@ exports.getFollowers = (req, res) => {
     //Find follower profile images
     User.find({ _id: { $in: followerIDs } })
       .then((data) => {
-        const followerImagePaths = data.map((follower) => {
-          return { [follower._id]: follower.profile.profileImageUrl };
+        let followerImagePaths = {};
+        data.map((follower) => {
+          followerImagePaths[follower._id] = follower.profile.profileImageUrl;
         });
         return res.json(followerImagePaths);
       })
