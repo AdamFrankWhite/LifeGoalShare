@@ -22,7 +22,7 @@ const {
 // Routes
 router.route("/").get(getLifeGoals);
 
-router.route("/followers").get(getFollowers);
+router.route("/followers").post(getFollowers);
 router.route("/:id").get(verifyToken, getUserLifeGoals);
 // Add getFollowedLifeGoals
 router.route("/add").post(verifyToken, addLifeGoal);

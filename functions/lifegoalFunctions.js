@@ -27,6 +27,7 @@ exports.getUserLifeGoals = (req, res) => {
 
 exports.getFollowers = (req, res) => {
   // deconstruct lifeGoalIDs array
+  console.log(req.params);
   const { lifeGoalIDs } = req.body;
   const lifeGoalIdObjects = lifeGoalIDs.map(
     (lifeGoal) => new ObjectId(lifeGoal)
