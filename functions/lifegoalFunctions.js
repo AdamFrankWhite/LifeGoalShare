@@ -26,19 +26,35 @@ exports.getUserLifeGoals = (req, res) => {
 //Get Followers
 
 exports.getFollowers = (req, res) => {
-  const { lifeGoalID } = req.body;
+  // deconstruct lifeGoalIDs array
+  const { lifeGoalIDs } = req.body;
+  const lifeGoalIdObjects = lifeGoalIDs.map(
+    (lifeGoal) => new ObjectId(lifeGoal)
+  );
+  console.log(lifeGoalIdObjects);
   // Find lifegoal followers
-  LifeGoal.find({ _id: new ObjectId(lifeGoalID) }).then((lifegoal) => {
-    const [followers] = lifegoal;
-    const followerIDs = followers.followers.map(
-      (follower) => new ObjectId(follower.followerID)
-    );
+  LifeGoal.find({ _id: { $in: lifeGoalIdObjects } }).then((lifegoals) => {
+    console.log(lifegoals);
+    let followersList = [];
+    lifegoals.forEach((lifeGoal) => {
+      //Extract followers array from lifeGoal object
+      let { followers } = lifeGoal;
+      followers.forEach((follower) => {
+        if (!followersList.includes(follower.followerID)) {
+          followersList.push(follower.followerID);
+        }
+      });
+      // if followers doesn't include, push followerID
+    });
+    console.log(followersList);
+
+    const followerIDs = followersList.map((follower) => new ObjectId(follower));
     //Find follower profile images
     User.find({ _id: { $in: followerIDs } })
       .then((data) => {
-        const followerImagePaths = data.map(
-          (follower) => follower.profile.profileImageUrl
-        );
+        const followerImagePaths = data.map((follower) => {
+          return { [follower._id]: follower.profile.profileImageUrl };
+        });
         return res.json(followerImagePaths);
       })
       .catch((err) => res.json(err));
