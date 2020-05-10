@@ -16,15 +16,18 @@ const {
   deletePost,
   getUserLifeGoals,
   commentOnPost,
+  getFollowers,
 } = require("../functions/lifegoalFunctions");
 
 // Routes
 router.route("/").get(getLifeGoals);
+
+router.route("/followers").get(getFollowers);
 router.route("/:id").get(verifyToken, getUserLifeGoals);
 // Add getFollowedLifeGoals
 router.route("/add").post(verifyToken, addLifeGoal);
 router.route("/post/add").post(verifyToken, addNewPost);
-router.route("/post/delete").delete(verifyToken, deletePost);
+router.route("/post/delete").put(verifyToken, deletePost);
 router.route("/delete").delete(verifyToken, deleteLifeGoal);
 router.route("/follow").post(verifyToken, followLifeGoal);
 router.route("/unfollow").delete(verifyToken, unfollowLifeGoal);

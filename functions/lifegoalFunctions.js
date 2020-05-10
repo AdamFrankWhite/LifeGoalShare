@@ -23,6 +23,29 @@ exports.getUserLifeGoals = (req, res) => {
     });
 };
 
+//Get Followers
+
+exports.getFollowers = (req, res) => {
+  const { lifeGoalID } = req.body;
+  // Find lifegoal followers
+  LifeGoal.find({ _id: new ObjectId(lifeGoalID) }).then((lifegoal) => {
+    const [followers] = lifegoal;
+    const followerIDs = followers.followers.map(
+      (follower) => new ObjectId(follower.followerID)
+    );
+    //Find follower profile images
+    User.find({ _id: { $in: followerIDs } })
+      .then((data) => {
+        const followerImagePaths = data.map(
+          (follower) => follower.profile.profileImageUrl
+        );
+        return res.json(followerImagePaths);
+      })
+      .catch((err) => res.json(err));
+    // console.log(lifegoal);
+  });
+};
+
 exports.addLifeGoal = (req, res) => {
   const {
     lifeGoalName,
@@ -203,6 +226,7 @@ exports.unfollowLifeGoal = (req, res) => {
     }
   );
 };
+
 //Add comment
 
 exports.postNewComment = (req, res) => {
