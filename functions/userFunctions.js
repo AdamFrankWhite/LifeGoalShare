@@ -186,7 +186,7 @@ exports.login = (req, res) => {
       err.message = "User or password do not match";
       return res.json(err);
     } else {
-      console.log("Logged In");
+      console.log("Login atttempt...");
       // If authorised, create token
       jwt.sign(
         { user },
@@ -194,11 +194,11 @@ exports.login = (req, res) => {
         // { expiresIn: "5m" },
         (err, token) => {
           if (token) {
-            // add res.header = token   ??
-            res.json({ token });
-            //TODO: put token in local storage
+            console.log("Success");
+            res.status(200).json({ token });
           } else {
-            res.json("Error: " + err);
+            console.log("Login failed");
+            res.status(401).json("Error: " + err);
           }
         }
       );

@@ -29,7 +29,7 @@ router.route("/delete").delete(verifyToken, deleteLifeGoal);
 router.route("/follow").post(verifyToken, followLifeGoal);
 router.route("/unfollow").delete(verifyToken, unfollowLifeGoal);
 router.route("/comment/get").get(verifyToken, getSingleComment);
-router.route("/comment/post").post(verifyToken, postNewComment);
+router.route("/comment/new").post(verifyToken, postNewComment);
 router.route("/comment/delete").put(verifyToken, deleteComment);
 router.route("/comments").get(verifyToken, getLifeGoalComments);
 router.route("/comment/edit").put(verifyToken, editComment);

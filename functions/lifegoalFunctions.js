@@ -137,7 +137,7 @@ exports.deletePost = (req, res) => {
 };
 
 exports.commentOnPost = (req, res) => {
-  const { lifeGoalID, postID, comment, parentComments } = req.body;
+  const { postID, comment, parentComments } = req.body;
   const commentID = new ObjectId().toString();
   const newDate = new Date();
 
@@ -150,7 +150,7 @@ exports.commentOnPost = (req, res) => {
   };
 
   LifeGoal.findOneAndUpdate(
-    { _id: new ObjectId(lifeGoalID), "posts.postID": new ObjectId(postID) },
+    { "posts.postID": new ObjectId(postID) },
     { $addToSet: { "posts.$.comments": userComment } },
     { new: true },
     (err, lifeGoal) => {
