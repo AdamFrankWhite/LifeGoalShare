@@ -14,8 +14,9 @@ function verifyToken(req, res, next) {
         res.sendStatus(403);
       } else {
         // Place logged in user id in req object, to be passed along to callback function
-        req.currentUser = authData.user._id.toString();
+        req.currentUserID = authData.user._id.toString();
         req.currentUserData = authData.user;
+        req.currentUserHandle = authData.user.profile.handle;
         next();
       }
     });
