@@ -36,6 +36,7 @@ app.use(fileUpload());
 // Routers
 const usersRouter = require("./routes/users.js");
 const lifegoalsRouter = require("./routes/lifegoals.js");
+const messagesRouter = require("./routes/messages.js");
 
 //TODO - session/passport for db user restrictions to database
 
@@ -43,6 +44,7 @@ const lifegoalsRouter = require("./routes/lifegoals.js");
 
 app.use("/users", usersRouter);
 app.use("/lifegoals", lifegoalsRouter);
+app.use("/messages", messagesRouter);
 
 //TODO - pass verifyToken to users, clean up userFunctions
 
