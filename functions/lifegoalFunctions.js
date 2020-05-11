@@ -27,15 +27,12 @@ exports.getUserLifeGoals = (req, res) => {
 
 exports.getFollowers = (req, res) => {
   // deconstruct lifeGoalIDs array
-  console.log(req.params);
   const { lifeGoalIDs } = req.body;
   const lifeGoalIdObjects = lifeGoalIDs.map(
     (lifeGoal) => new ObjectId(lifeGoal)
   );
-  console.log(lifeGoalIdObjects);
   // Find lifegoal followers
   LifeGoal.find({ _id: { $in: lifeGoalIdObjects } }).then((lifegoals) => {
-    console.log(lifegoals);
     let followersList = [];
     lifegoals.forEach((lifeGoal) => {
       //Extract followers array from lifeGoal object
@@ -47,7 +44,6 @@ exports.getFollowers = (req, res) => {
       });
       // if followers doesn't include, push followerID
     });
-    console.log(followersList);
 
     const followerIDs = followersList.map((follower) => new ObjectId(follower));
     //Find follower profile images
@@ -60,7 +56,6 @@ exports.getFollowers = (req, res) => {
         return res.json(followerImagePaths);
       })
       .catch((err) => res.json(err));
-    // console.log(lifegoal);
   });
 };
 

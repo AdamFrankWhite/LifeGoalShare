@@ -26,11 +26,13 @@ connection.once("open", () => {
 exports.getAuthenticatedUser = (req, res) => {
   User.findOne({ _id: req.currentUser })
     .then((user) => {
+      console.log(user);
       let resData = {
         _id: user._id,
         profile: user.profile,
         username: user.username,
         createdAt: user.createdAt,
+        messages: user.messages,
       };
       res.json(resData);
     })
@@ -70,7 +72,6 @@ exports.getAllUsers = (req, res) => {
 // exports.showImageFile = (req, res) => {
 //   gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
 //     //Check if file
-//     console.log(file);
 //     if (!file || file.length === 0) {
 //       return res.status(404).json({ err: "File does not exist" });
 //     }
@@ -119,7 +120,6 @@ exports.signup = (req, res) => {
         .save()
         .then(() => res.json(`${username} signed up successfully!`))
         .catch((err) => {
-          console.log(err);
           let errorMessage;
           res.status(400);
           if (err.errmsg.includes("username_1 dup key")) {
@@ -186,7 +186,7 @@ exports.login = (req, res) => {
       err.message = "User or password do not match";
       return res.json(err);
     } else {
-      console.log("Login atttempt...");
+      console.log("Login attempt...");
       // If authorised, create token
       jwt.sign(
         { user },
@@ -212,7 +212,6 @@ exports.login = (req, res) => {
 //   const storage = new GridFsStorage({
 //     url: process.env.ATLAS_URI,
 //     file: (req, file) => {
-//       console.log(file.mimetype);
 //       if (file.mimetype !== "image/png" && file.mimetype !== "image/jpeg") {
 //         throw "Error: File must be jpg or png";
 //       }
@@ -368,7 +367,6 @@ exports.deleteMessage = (req, res) => {
 };
 
 exports.getUserComments = (req, res) => {
-  console.log(typeof req.currentUser);
   LifeGoal.find({ comments: { $elemMatch: { author: req.currentUser } } })
     .then((posts) => {
       let myComments = [];
