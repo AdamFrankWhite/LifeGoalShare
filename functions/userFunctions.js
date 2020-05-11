@@ -24,7 +24,7 @@ connection.once("open", () => {
 
 //GET
 exports.getAuthenticatedUser = (req, res) => {
-  User.findOne({ _id: req.currentUser })
+  User.findOne({ _id: req.currentUserID })
     .then((user) => {
       console.log(user);
       let resData = {
@@ -57,35 +57,6 @@ exports.getAllUsers = (req, res) => {
     .then((users) => res.json(users))
     .catch((err) => res.status(400).json("Error:" + err));
 };
-
-// exports.getProfileImageFile = (req, res) => {
-//   gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-//     //Check if file
-//     if (!file || file.length === 0) {
-//       return res.status(404).json({ err: "File does not exist" });
-//     }
-
-//     return res.json(file);
-//   });
-// };
-
-// exports.showImageFile = (req, res) => {
-//   gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-//     //Check if file
-//     if (!file || file.length === 0) {
-//       return res.status(404).json({ err: "File does not exist" });
-//     }
-//     if (file.contentType === "image/jpeg" || file.contentType === "image/png") {
-//       // Read output to browser
-//       const readStream = gfs.createReadStream(file.filename);
-
-//       res.writeHead(200, { "Content-Type": "image/png" });
-//       readStream.pipe(res);
-//     } else {
-//       res.status(404).json({ err: "Not an image" });
-//     }
-//   });
-// };
 
 //POST
 exports.signup = (req, res) => {
@@ -207,34 +178,6 @@ exports.login = (req, res) => {
 };
 
 //POST
-// exports.createProfileImageUpload = (req, res) => {
-//   //Create storage engine
-//   const storage = new GridFsStorage({
-//     url: process.env.ATLAS_URI,
-//     file: (req, file) => {
-//       if (file.mimetype !== "image/png" && file.mimetype !== "image/jpeg") {
-//         throw "Error: File must be jpg or png";
-//       }
-//       return new Promise((resolve, reject) => {
-//         crypto.randomBytes(16, (err, buf) => {
-//           if (err) {
-//             return reject(err);
-//           }
-//           const filename =
-//             buf.toString("hex") + path.extname(file.originalname);
-//           const fileInfo = {
-//             filename: filename,
-//             bucketName: "uploads",
-//           };
-//           resolve(fileInfo);
-//         });
-//       });
-//     },
-//   });
-//   return multer({ storage });
-// };
-
-//POST
 
 exports.fileUpload = (req, res) => {
   if (req.files === null) {
@@ -242,8 +185,8 @@ exports.fileUpload = (req, res) => {
   }
   // NEED TO VALIDATE IMAGE
   const file = req.files.file;
-  const fileDestinationUrl = `../../lifegoalshare-client/public/uploads/profilePics/${req.currentUser}`;
-  const clientFileUrl = `/uploads/profilePics/${req.currentUser}/${file.name}`;
+  const fileDestinationUrl = `../../lifegoalshare-client/public/uploads/profilePics/${req.currentUserID}`;
+  const clientFileUrl = `/uploads/profilePics/${req.currentUserID}/${file.name}`;
   let clientPath = path.join(__dirname, fileDestinationUrl);
   // Checks if user image folder exists, if not creates one
   if (!fs.existsSync(clientPath)) {
@@ -258,7 +201,7 @@ exports.fileUpload = (req, res) => {
     }
   });
   User.findOneAndUpdate(
-    { _id: ObjectId(req.currentUser) },
+    { _id: ObjectId(req.currentUserID) },
     { $set: { "profile.profileImageUrl": clientFileUrl } },
     { new: true },
     (err, user) => {
@@ -279,7 +222,7 @@ exports.setProfileImage = (req, res) => {
   const { profileImageUrl } = req.body;
 
   User.findOneAndUpdate(
-    { _id: ObjectId(req.currentUser) },
+    { _id: ObjectId(req.currentUserID) },
     { $set: { "profile.profileImageUrl": profileImageUrl } },
     { new: true },
     (err, user) => {
@@ -295,7 +238,7 @@ exports.updateUserDetails = (req, res) => {
   const { location, bio, lifeGoalCategories } = req.body;
 
   User.findOneAndUpdate(
-    { _id: req.currentUser },
+    { _id: req.currentUserID },
     { $set: { "profile.location": location, "profile.bio": bio } },
     { new: true },
     (err, user) => {
@@ -307,67 +250,8 @@ exports.updateUserDetails = (req, res) => {
   );
 };
 
-exports.sendMessage = (req, res) => {
-  const { senderID, receiverID, message, parents } = req.body;
-  const messageToBeSent = {
-    messageID: new ObjectId(),
-    senderID,
-    receiverID,
-    message,
-    parents: !parents ? [] : parents,
-    createdAt: new Date(),
-  };
-
-  // Sent Message
-  User.findOneAndUpdate(
-    { _id: ObjectId(senderID) },
-    { $addToSet: { "messages.sent": messageToBeSent } },
-    (err, user) => {
-      if (err) {
-        res.json(err);
-      } else {
-        res.json(user);
-      }
-    }
-  );
-
-  //Received Message
-  User.findOneAndUpdate(
-    { _id: ObjectId(receiverID) },
-    { $addToSet: { "messages.received": messageToBeSent } },
-    (err, user) => {
-      if (err) {
-        res.json(err);
-      } else {
-        res.json(user);
-      }
-    }
-  );
-};
-
-exports.deleteMessage = (req, res) => {
-  const { userID, messageID, messageType } = req.body;
-  // Only deletes message for user taking action
-  User.findOneAndUpdate(
-    { _id: userID },
-    {
-      $pull: {
-        [`messages.${messageType}`]: { messageID: ObjectId(messageID) },
-      },
-    },
-    { safe: true },
-    (err, user) => {
-      if (err) {
-        res.json(err);
-      } else {
-        res.json("Message deleted");
-      }
-    }
-  );
-};
-
 exports.getUserComments = (req, res) => {
-  LifeGoal.find({ comments: { $elemMatch: { author: req.currentUser } } })
+  LifeGoal.find({ comments: { $elemMatch: { author: req.currentUserID } } })
     .then((posts) => {
       let myComments = [];
       posts.forEach((post) => {

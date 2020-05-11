@@ -72,7 +72,7 @@ exports.addLifeGoal = (req, res) => {
     postID: new ObjectId(),
     postName: initialPostName,
     postContent: initialPostContent,
-    createdBy: req.currentUser,
+    createdBy: req.currentUserID,
     createdAt: new Date(),
     comments: [],
     postHeaderImage: initialPostHeaderImage
@@ -97,7 +97,7 @@ exports.addLifeGoal = (req, res) => {
 
 exports.deleteLifeGoal = (req, res) => {
   // Grab username from JWT
-  let loggedInUser = req.currentUser;
+  let loggedInUser = req.currentUserID;
 
   const { lifeGoalID } = req.body;
   let lifeGoalCreator = "";
@@ -130,7 +130,7 @@ exports.addNewPost = (req, res) => {
     postID: new ObjectId(),
     postName: postData.postName,
     postContent: postData.postContent,
-    createdBy: req.currentUser,
+    createdBy: req.currentUserID,
     createdAt: newDate,
     comments: [],
     postHeaderImage: postData.postHeaderImage ? postData.postHeaderImage : "",
@@ -154,7 +154,7 @@ exports.addNewPost = (req, res) => {
 exports.deletePost = (req, res) => {
   const { lifeGoalID, postID } = req.body;
   // Grab username from JWT
-  let loggedInUser = req.currentUser;
+  let loggedInUser = req.currentUserID;
 
   // Grab lifegoal createdBy value
 
@@ -204,7 +204,7 @@ exports.followLifeGoal = (req, res) => {
 
   // Add follower to lifeGoal
   let followerData = {
-    followerID: req.currentUser,
+    followerID: req.currentUserID,
     dateFollowed: new Date(),
   };
   LifeGoal.findOneAndUpdate(
@@ -228,7 +228,7 @@ exports.unfollowLifeGoal = (req, res) => {
   // Update lifegoal
   LifeGoal.findOneAndUpdate(
     { _id: new ObjectId(lifeGoalID) }, // To be clear ======> When querying main collection with id, it needs to be an object. However, if you created ids, then string is to be expected
-    { $pull: { followers: { followerID: req.currentUser } } },
+    { $pull: { followers: { followerID: req.currentUserID } } },
     { safe: true },
     (err, lifeGoal) => {
       if (err) {
