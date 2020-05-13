@@ -2,7 +2,6 @@ const Message = require("../models/message.model");
 
 exports.getMessages = (req, res) => {
   let user = req.currentUserHandle;
-  console.log(user);
   Message.find({ $or: [{ sender: user }, { receiver: user }] })
     .then((messages) => {
       res.json(messages);

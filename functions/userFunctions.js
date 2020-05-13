@@ -26,7 +26,6 @@ connection.once("open", () => {
 exports.getAuthenticatedUser = (req, res) => {
   User.findOne({ _id: req.currentUserID })
     .then((user) => {
-      console.log(user);
       let resData = {
         _id: user._id,
         profile: user.profile,

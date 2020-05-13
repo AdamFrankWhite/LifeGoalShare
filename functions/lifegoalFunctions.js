@@ -25,35 +25,43 @@ exports.getUserLifeGoals = (req, res) => {
 
 //Get Followers
 
-exports.getFollowers = (req, res) => {
+exports.getProfileImages = (req, res) => {
   // deconstruct lifeGoalIDs array
   const { lifeGoalIDs } = req.body;
+  let usersList = [];
   const lifeGoalIdObjects = lifeGoalIDs.map(
     (lifeGoal) => new ObjectId(lifeGoal)
   );
+
   // Find lifegoal followers
   LifeGoal.find({ _id: { $in: lifeGoalIdObjects } }).then((lifegoals) => {
-    let followersList = [];
     lifegoals.forEach((lifeGoal) => {
       //Extract followers array from lifeGoal object
       let { followers } = lifeGoal;
       followers.forEach((follower) => {
-        if (!followersList.includes(follower.followerID)) {
-          followersList.push(follower.followerID);
+        // if followers doesn't include, push followerID
+        if (!usersList.includes(follower.followerID)) {
+          usersList.push(follower.followerID);
         }
       });
-      // if followers doesn't include, push followerID
+
+      //Extract lifeGoalCreator
+      let lifeGoalCreatorID = lifeGoal.createdBy.userID;
+      // if followers doesn't include, push lifeGoalCreatorID
+      if (!usersList.includes(lifeGoalCreatorID)) {
+        usersList.push(lifeGoalCreatorID);
+      }
     });
 
-    const followerIDs = followersList.map((follower) => new ObjectId(follower));
+    const userIDs = usersList.map((follower) => new ObjectId(follower));
     //Find follower profile images
-    User.find({ _id: { $in: followerIDs } })
+    User.find({ _id: { $in: userIDs } })
       .then((data) => {
-        let followerImagePaths = {};
-        data.map((follower) => {
-          followerImagePaths[follower._id] = follower.profile.profileImageUrl;
+        let userImagePaths = {};
+        data.map((user) => {
+          userImagePaths[user._id] = user.profile.profileImageUrl;
         });
-        return res.json(followerImagePaths);
+        return res.json(userImagePaths);
       })
       .catch((err) => res.json(err));
   });
@@ -80,6 +88,10 @@ exports.addLifeGoal = (req, res) => {
       : "PLACEHOLDER_HEADER_IMG",
   };
 
+  //Append userID into createdBy object
+  const userProfile = req.currentUserData.profile;
+  userProfile.userID = req.currentUserID;
+  //Create New LifeGoal
   const lifeGoal = new LifeGoal({
     lifeGoalName,
     lifeGoalDescription,
@@ -208,7 +220,11 @@ exports.followLifeGoal = (req, res) => {
     dateFollowed: new Date(),
   };
   LifeGoal.findOneAndUpdate(
-    { _id: lifeGoalID },
+    //Find lifegoal, ignore addToSet if userID already exists in followers
+    {
+      _id: new ObjectId(lifeGoalID),
+      "followers.followerID": { $ne: req.currentUserID },
+    },
     { $addToSet: { followers: followerData } },
     { new: true },
     (err, lifeGoal) => {
