@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyparser = require("body-parser");
 const fileUpload = require("express-fileupload");
+const http = require("http");
+const socketio = require("socket.io");
 
 // Config
 
@@ -28,6 +30,14 @@ connection.once("open", () => {
 // Initialise App
 const app = express();
 
+//Initialise server manually
+
+const server = http.createServer(app);
+
+// Socketio config
+
+const io = socketio(server);
+
 // Middleware
 app.use(express.json());
 app.use(cors());
@@ -48,6 +58,16 @@ app.use("/messages", messagesRouter);
 
 //TODO - pass verifyToken to users, clean up userFunctions
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server is up and running on port ${port}`);
+});
+
+// Listen for client socket connection
+
+io.on("connection", (socket) => {
+  console.log("New socket connection");
+
+  socket.once("disconnect", () => {
+    console.log("User disconnected");
+  });
 });

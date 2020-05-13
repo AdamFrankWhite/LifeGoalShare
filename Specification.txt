@@ -30,3 +30,4 @@ Data Consistency - need transactions to ensure data remans consistent when makin
 16/4/20 Breakthroughs - 1) simplify schema, no need to duplicate data with refs, simply query collection separately. 2) pass along new header in middleware for easy verification
 17/4/20 When uploading server to heroku, remove node_modules and also make sure to use bcryptjs, not bcrypt, as it has node compatibility issues
 29/4/20 - storing files in database seems overly complex and bloated. vs the benefits/drawbacks compared to hosting static files, chose latter - simpler, faster and less bloated, although lose some data records
+13/5/20 - using http.createServer creates static URL paths 
